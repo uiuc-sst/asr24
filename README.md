@@ -11,7 +11,7 @@ from which phone strings are extracted, merged with [PTgen](https://github.com/u
 
 ### Set up Krisztián Varga's [extension](https://chrisearch.wordpress.com/2017/03/11/speech-recognition-using-kaldi-extending-and-using-the-aspire-model/) of [ASpIRE](http://kaldi-asr.org/models.html).
 
-- If you don't already have Kaldi, `git clone https://github.com/kaldi-asr/kaldi` and build it, following the instructions in its `INSTALL` file.
+- If you haven't already installed a version of Kaldi newer than 2016 Sep 30, `git clone https://github.com/kaldi-asr/kaldi` and build it, following the instructions in its `INSTALL` file.
 - Get the [ASpIRE chain model](http://kaldi-asr.org/models.html):
 ```
     cd kaldi/egs/aspire/s5
