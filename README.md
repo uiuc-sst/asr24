@@ -16,14 +16,17 @@ from which phone strings are extracted, merged with [PTgen](https://github.com/u
 - Get the [ASpIRE chain model](http://kaldi-asr.org/models.html):
 ```
     cd kaldi/egs/aspire/s5
-    wget http://dl.kaldi-asr.org/models/0001_aspire_chain_model.tar.gz
-    tar xf 0001_aspire_chain_model.tar.gz
-    steps/online/nnet3/prepare_online_decoding.sh --mfcc-config conf/mfcc_hires.conf data/lang_chain exp/nnet3/extractor exp/chain/tdnn_7b exp/tdnn_7b_chain_online
-    utils/mkgraph.sh --self-loop-scale 1.0 data/lang_pp_test exp/tdnn_7b_chain_online exp/tdnn_7b_chain_online/graph_pp
+    wget -qO- http://dl.kaldi-asr.org/models/0001_aspire_chain_model.tar.gz | tar xz
+    steps/online/nnet3/prepare_online_decoding.sh \
+      --mfcc-config conf/mfcc_hires.conf \
+      data/lang_chain exp/nnet3/extractor \
+      exp/chain/tdnn_7b exp/tdnn_7b_chain_online
+    utils/mkgraph.sh --self-loop-scale 1.0 data/lang_pp_test \
+      exp/tdnn_7b_chain_online exp/tdnn_7b_chain_online/graph_pp
 ```
 - Verify that it can transcribe a recording of English speech.  (The scripts `cmd.sh` and `path.sh` let the shell find `kaldi/src/online2bin/online2-wav-nnet3-latgen-faster`.)
 
-`ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000 8khz.wav` or `sox MySpeech.wav -r 8000 8khz.wav`
+`sox MySpeech.wav -r 8000 8khz.wav`, or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000 8khz.wav`
 ```
 . cmd.sh && . path.sh
 online2-wav-nnet3-latgen-faster \
@@ -43,7 +46,7 @@ online2-wav-nnet3-latgen-faster \
   'ark:/dev/null'
 ```
 
-### Install our own code.
+### Install this repo's code.
 ```
     cd kaldi/egs/aspire/s5
     git clone https://github.com/uiuc-sst/asr24.git
