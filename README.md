@@ -28,6 +28,8 @@ from which phone strings are extracted, merged with [PTgen](https://github.com/u
     utils/mkgraph.sh --self-loop-scale 1.0 data/lang_pp_test \
       exp/tdnn_7b_chain_online exp/tdnn_7b_chain_online/graph_pp
 ```
+This last command `mkgraph.sh` can take a long time and use a lot of memory, because it calls `fstdeterminizestar` on a large language model, as Dan Povey [explains](https://groups.google.com/forum/#!topic/kaldi-help/3C6ypvqLpCw).
+
 - Verify that it can transcribe a recording of English speech.  (The scripts `cmd.sh` and `path.sh` let the shell find `kaldi/src/online2bin/online2-wav-nnet3-latgen-faster`.)
 
 `sox MySpeech.wav -r 8000 8khz.wav`, or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000 8khz.wav`
