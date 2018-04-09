@@ -51,6 +51,7 @@ This last command `mkgraph.sh` can take 45 minutes and use a lot of memory becau
 
 #### Install this repo's code.
 ```
-    cd kaldi/egs/aspire/s5
+    cd kaldi/egs/aspire
     git clone https://github.com/uiuc-sst/asr24.git
+    cd asr24
 ```
