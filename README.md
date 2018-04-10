@@ -39,9 +39,12 @@ It goes into a directory `asr24`, a sister of the usual `s5` directory.
 ```
 This last command `mkgraph.sh` can take 45 minutes and use a lot of memory because it calls `fstdeterminizestar` on a large language model, as Dan Povey [explains](https://groups.google.com/forum/#!topic/kaldi-help/3C6ypvqLpCw).
 
-- Verify that it can transcribe a recording of English speech.  (The scripts `cmd.sh` and `path.sh` let the shell find `kaldi/src/online2bin/online2-wav-nnet3-latgen-faster`.)
+- Verify that it can transcribe a recording of English speech.
+Either use the provided [**8khz.wav**](./8khz.wav),
+or `sox MySpeech.wav -r 8000 `**`8khz.wav`**,
+or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000 `**`8khz.wav`**.
 
-`sox MySpeech.wav -r 8000 `**`8khz.wav`**, or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000 `**`8khz.wav`**
+(The scripts `cmd.sh` and `path.sh` let the shell find `kaldi/src/online2bin/online2-wav-nnet3-latgen-faster`.)
 ```
     . cmd.sh && . path.sh
     online2-wav-nnet3-latgen-faster \
