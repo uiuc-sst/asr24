@@ -21,11 +21,3 @@ tamil_eval_transcripts.txt
 tamil_ni_transcripts.txt
 ```
 ``qsub -d `pwd` -l walltime=00:90:00,nodes=2 job.sh``
-
-## Different:
-```
-utt2spk                 // built by tam-Saturday-init.sh
-exp/tdnn_7b_chain_online/conf/ivector_extractor.conf
-exp/tdnn_7b_chain_online/conf/online.conf
-wav.scp: "TAM_EVAL_002_001 /scratch/users/cog/tam.8khz/TAM_EVAL_002_001.wav" or "dutch_140903_358463-19 dutch8k/dutch_140903_358463-19.wav"
-```
