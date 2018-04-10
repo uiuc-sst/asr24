@@ -9,17 +9,26 @@ from which phone strings are extracted, merged with [PTgen](https://github.com/u
 
 ## How to install
 
-#### Set up Krisztián Varga's [extension](https://chrisearch.wordpress.com/2017/03/11/speech-recognition-using-kaldi-extending-and-using-the-aspire-model/) of [ASpIRE](http://kaldi-asr.org/models.html).
-
-- If you haven't already installed a version of Kaldi newer than 2016 Sep 30, `git clone https://github.com/kaldi-asr/kaldi` and build it, following the instructions in its INSTALL files:
+#### Install Kaldi.
+If you haven't already installed a version of Kaldi newer than 2016 Sep 30, `git clone https://github.com/kaldi-asr/kaldi` and build it, following the instructions in its INSTALL files:
 ```
-    cd tools; make -j $(nproc)
+    cd kaldi/tools; make -j $(nproc)
     cd ../src; ./configure --shared && make depend -j $(nproc) && make -j $(nproc)
 ```
 
+#### Get this repo's code.
+It goes into a directory `asr24`, a sister of the usual `s5` directory.
+```
+    cd kaldi/egs/aspire
+    git clone https://github.com/uiuc-sst/asr24.git
+    cd asr24
+```
+
+#### Set up Krisztián Varga's [extension](https://chrisearch.wordpress.com/2017/03/11/speech-recognition-using-kaldi-extending-and-using-the-aspire-model/) of [ASpIRE](http://kaldi-asr.org/models.html).
+
 - Get the [ASpIRE chain model](http://kaldi-asr.org/models.html):
 ```
-    cd kaldi/egs/aspire/s5
+    cd kaldi/egs/aspire/asr24
     wget -qO- http://dl.kaldi-asr.org/models/0001_aspire_chain_model.tar.gz | tar xz
     steps/online/nnet3/prepare_online_decoding.sh \
       --mfcc-config conf/mfcc_hires.conf \
@@ -49,9 +58,4 @@ This last command `mkgraph.sh` can take 45 minutes and use a lot of memory becau
       'ark:/dev/null'
 ```
 
-#### Install this repo's code.
-```
-    cd kaldi/egs/aspire
-    git clone https://github.com/uiuc-sst/asr24.git
-    cd asr24
-```
+
