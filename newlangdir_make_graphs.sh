@@ -1,9 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# Try this on ifp-53, because campus cluster lacks a Unicode-compatible perl.
+# (Runs on a Mac in a few hours.)
+# Example inputs are /scratch/users/jhasegaw/kaldi/egs/aspire/s5/{russian,tamil} (5 GB and 1 GB).
 
 if [ $# != 1 ]; then
-  echo "Usage: $0 <newlangdir>"
-  echo "<newlangdir> must include lang/clean.txt."
-  echo "<newlangdir>/local/dict/ must include lexicon.txt, extra_questions.txt, nonsilence_phones.txt, optional_silence.txt, silence_phones.txt, topo, words.txt"
+  echo "Usage: $0 <newlangdir>" # e.g., $0 tamil, or $0 russian.
+  echo "Inputs: <newlangdir>/lang/clean.txt,"
+  echo "        <newlangdir>/local/dict/{lexicon.txt, extra_questions.txt, nonsilence_phones.txt, optional_silence.txt, silence_phones.txt, topo, words.txt}."
+  echo "Output: <newlangdir>/graph/HCLG.fst."
   echo "SRILM must be in your path."
   exit 1
 fi
@@ -58,3 +63,5 @@ utils/mkgraph.sh --self-loop-scale 1.0 $lang $model $graph
 # Put these into the directory ${newlangdir}/conf.
 echo "$0: prepare_online_decoding"
 steps/online/nnet3/prepare_online_decoding.sh --mfcc-config conf/mfcc_hires.conf $lang exp/nnet3/extractor exp/chain/tdnn_7b ${newlangdir}
+
+# It doesn't matter that these last two steps are reversed from https://chrisearch.wordpress.com/2017/03/11/speech-recognition-using-kaldi-extending-and-using-the-aspire-model.
