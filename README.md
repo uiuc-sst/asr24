@@ -61,4 +61,9 @@ or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000` **`8khz.wav`**.
       'ark:/dev/null'
 ```
 
+#### Transcribe the IL speech.
+
+- Run `./newlangdir_make_graphs.sh <IL>`, probably on ifp-53.
+- Run `./mkscp.py` to split the transcription tasks into jobs short enough for the campus cluster's secondary queue.
+- qsub those jobs.
 
