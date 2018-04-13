@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 
-# Try this on ifp-53, because campus cluster lacks a Unicode-compatible perl.
-# (Runs on a Mac in a few hours.)
-# Example inputs are /scratch/users/jhasegaw/kaldi/egs/aspire/s5/{russian,tamil} (5 GB and 1 GB).
+# Try this on ifp-53, because campus cluster lacks a UTF-8-compatible perl needed by utils/validate_dict_dir.pl, called by utils/prepare_lang.sh.
+# (Runs on a Mac in a few hours.  Much faster than Sequitur, a full weekend.)
+# Example inputs and outputs are /scratch/users/jhasegaw/kaldi/egs/aspire/s5/{russian,tamil} (5 GB and 1 GB).
 
 if [ $# != 1 ]; then
   echo "Usage: $0 <newlangdir>" # e.g., $0 tamil, or $0 russian.
-  echo "Inputs: <newlangdir>/lang/clean.txt,"
-  echo "        <newlangdir>/local/dict/{lexicon.txt, extra_questions.txt, nonsilence_phones.txt, optional_silence.txt, silence_phones.txt, topo, words.txt}."
-  echo "Output: <newlangdir>/graph/HCLG.fst."
+  echo "Inputs and outputs are all in <newlangdir>."
+  echo "Inputs: lang/clean.txt,"
+  echo "        local/dict/{lexicon.txt, extra_questions.txt, nonsilence_phones.txt, optional_silence.txt, silence_phones.txt, topo, words.txt}."
+  echo "Intermediate outputs: local/dict/lexiconp.txt, dict/L.fst, lang/L.fst"
+  echo "Output: graph/HCLG.fst."
   echo "SRILM must be in your path."
   exit 1
 fi
@@ -41,6 +43,7 @@ dict=${newlangdir}/dict
 dict_tmp=${newlangdir}/dict_tmp
 graph=${newlangdir}/graph
 
+# Make lexiconp.txt from lexicon.txt.
 # Compile the word lexicon, L.fst.
 echo "$0: prepare_lang"
 if [ $dict_src/lexiconp.txt -ot $dict_src/lexicon.txt ]; then
