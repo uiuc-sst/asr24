@@ -10,7 +10,9 @@ if [ $# != 1 ]; then
   echo "Inputs and outputs are all in <newlangdir>."
   echo "Inputs: local/dict/lexicon.txt, train_all/text."
   echo "Intermediate outputs: local/lm/{text.no_oov, word.counts, unigram.counts, word_map, train.gz, wordlist.mapped"
-  echo "Output: local/lm/3gram-mincount/lm_unpruned.gz." # Or 3gram-mincount/{ngrams.gz, heldout_ngrams.gz, configs, perplexities}?
+  echo "Output: local/lm/3gram-mincount/lm_unpruned.gz."
+  # Output, from train_lm.sh at the end of this script,
+  # also includes 3gram-mincount/{ngrams.gz, heldout_ngrams.gz, configs, perplexities}.
   exit 1
 fi
 [ ! -d $1 ] && echo "$0: missing directory $1. Aborting." && exit 1
@@ -23,17 +25,17 @@ for f in "$text" "$lexicon"; do
 done
 
 export LC_ALL=C # This locale avoids errors about things being not sorted.
-export PATH=$PATH:`pwd`/../../../tools/kaldi_lm
+export PATH=$PATH:$PWD/../../../tools/kaldi_lm
 ( cd ../../../tools || exit 1
   if [ ! -d kaldi_lm ]; then
     if [ ! -f kaldi_lm.tar.gz ]; then
-      echo Downloading and installing the kaldi_lm tools.
+      echo "$0: downloading and installing the kaldi_lm tools."
       wget http://www.danielpovey.com/files/kaldi/kaldi_lm.tar.gz || exit 1
     fi
     tar xzf kaldi_lm.tar.gz || exit 1
     cd kaldi_lm
     make || exit 1
-    echo Installed the kaldi_lm tools.
+    echo "$0: installed the kaldi_lm tools."
   fi
 ) || exit 1
 
@@ -42,12 +44,13 @@ mkdir -p $dir
 cleantext=$dir/text.no_oov
 tmp=$dir/tmp
 
+echo "$0: converting $text and $lexicon into LM training data..."
 awk -v lex=$lexicon 'BEGIN{while((getline<lex) >0){ seen[$1]=1; } } 
   {for(n=1; n<=NF;n++) { if (seen[$n]) { printf("%s ", $n); } else {print("<unk> ");} } print("\n");}' \
   < $text > $cleantext || exit 1
 
 rm -rf $tmp
-awk '{for(n=2;n<=NF;n++) print $n; }' < $cleantext | tee $tmp \
+awk '{for(n=2;n<=NF;n++) print $n; }' < $cleantext | tee $tmp | \
   sort | uniq -c | sort -nr > $dir/word.counts || exit 1
 
 # Get counts from acoustic training transcripts.
@@ -66,6 +69,7 @@ awk -v wmap=$dir/word_map 'BEGIN{while((getline<wmap)>0)map[$1]=$2;}
   { for(n=2;n<=NF;n++) { print map[$n]; if(n<NF){ print " "; } else { print ""; }}}' \
   < $cleantext | gzip -c > $dir/train.gz || exit 1
 
+echo "$0: running train_lm.sh..."
 train_lm.sh --arpa --lmtype 3gram-mincount $dir || exit 1
 # Or --lmtype 4gram-mincount.
 
