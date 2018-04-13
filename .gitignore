@@ -1,2 +1,5 @@
+# These dirs are built by scripts in here.
 data
 exp
+# This is extracted from http://dl.kaldi-asr.org/models/0001_aspire_chain_model.tar.gz
+README.txt
