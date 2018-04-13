@@ -25,7 +25,6 @@ It goes into a directory `asr24`, a sister of the usual `s5` directory.
 ```
 
 #### Set up Krisztián Varga's [extension](https://chrisearch.wordpress.com/2017/03/11/speech-recognition-using-kaldi-extending-and-using-the-aspire-model/) of [ASpIRE](http://kaldi-asr.org/models.html).
-
 - Get the [ASpIRE chain model](http://kaldi-asr.org/models.html):
 ```
     cd kaldi/egs/aspire/asr24
@@ -62,9 +61,7 @@ or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000` **`8khz.wav`**.
 ```
 
 #### Transcribe the IL speech.
-
-- `./newlangdir_train_lms.sh` makes a language model for the IL, as an L.fst and G.fst, then an LG.fst.
-- `./newlangdir_make_graphs.sh <IL>`, probably on ifp-53, makes an HCLG.fst customized for the IL.
+- `./newlangdir_train_lms.sh` makes a language model for the IL.
+- `./newlangdir_make_graphs.sh <IL>`, probably on ifp-53, makes L.fst, G.fst, and then an IL-customized HCLG.fst.
 - `./mkscp.py` splits the transcription tasks into jobs shorter than the 30 minute maximum of the campus cluster's secondary queue.
 - `qsub` those jobs.
-

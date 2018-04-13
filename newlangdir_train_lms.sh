@@ -13,22 +13,21 @@ if [ $# != 1 ]; then
   echo "Output: local/lm/3gram-mincount/lm_unpruned.gz." # Or 3gram-mincount/{ngrams.gz, heldout_ngrams.gz, configs, perplexities}?
   exit 1
 fi
+[ ! -d $1 ] && echo "$0: missing directory $1. Aborting." && exit 1
 newlangdir=$1
 
 text=${newlangdir}/train_all/text
 lexicon=${newlangdir}/local/dict/lexicon.txt 
 for f in "$text" "$lexicon"; do
-  [ ! -f $x ] && echo "$0: Missing file $f. Aborting." && exit 1
+  [ ! -f $f ] && echo "$0: missing file $f. Aborting." && exit 1
 done
 
 export LC_ALL=C # This locale avoids errors about things being not sorted.
 export PATH=$PATH:`pwd`/../../../tools/kaldi_lm
 ( cd ../../../tools || exit 1
-  if [ -d kaldi_lm ]; then
-    # kaldi_lm tools are already installed.
-  else
-    echo Downloading and installing the kaldi_lm tools.
+  if [ ! -d kaldi_lm ]; then
     if [ ! -f kaldi_lm.tar.gz ]; then
+      echo Downloading and installing the kaldi_lm tools.
       wget http://www.danielpovey.com/files/kaldi/kaldi_lm.tar.gz || exit 1
     fi
     tar xzf kaldi_lm.tar.gz || exit 1

@@ -14,23 +14,14 @@ if [ $# != 1 ]; then
   echo "SRILM must be in your path."
   exit 1
 fi
+[ ! -d $1 ] && echo "$0: missing directory $1. Aborting." && exit 1
 newlangdir=$1
 
 # Set up environment variables.
 . cmd.sh
 . path.sh
 
-# Find SRILM.
-if ! ngram-count &> /dev/null; then
-  if -e /scratch/users/jhasegaw/srilm/path.sh; then
-    pushd /scratch/users/jhasegaw/srilm
-    . /scratch/users/jhasegaw/srilm/path.sh
-    popd
-  else
-    echo "$0: failed to find SRILM tools."
-    exit -1
-  fi
-fi
+command -v ngram-count 1>/dev/null 2>&1 || { echo "$0: failed to find SRILM tools. Install SRILM and update path.sh."; exit 1; }
 
 # Get the paths of our input files.
 model=exp/tdnn_7b_chain_online
@@ -54,7 +45,7 @@ utils/prepare_lang.sh --phone-symbol-table $phones_src $dict_src "<unk>" $dict_t
 # Create the grammar/language model, G.fst.
 echo "$0: ngram-count"
 ngram-count -text $lang/clean.txt -order 3 -limit-vocab -vocab $dict_src/words.txt -kndiscount -interpolate -lm $lm_src
-gzip < $lm_src > $lm_src.gz
+gzip $lm_src
 echo "$0: format_lm"
 utils/format_lm.sh $dict $lm_src.gz $dict_src/lexicon.txt $lang
  
