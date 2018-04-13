@@ -63,7 +63,8 @@ or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000` **`8khz.wav`**.
 
 #### Transcribe the IL speech.
 
-- Run `./newlangdir_make_graphs.sh <IL>`, probably on ifp-53.
-- Run `./mkscp.py` to split the transcription tasks into jobs short enough for the campus cluster's secondary queue.
-- qsub those jobs.
+- `./newlangdir_train_lms.sh` makes a language model for the IL, as an L.fst and G.fst, then an LG.fst.
+- `./newlangdir_make_graphs.sh <IL>`, probably on ifp-53, makes an HCLG.fst customized for the IL.
+- `./mkscp.py` splits the transcription tasks into jobs shorter than the 30 minute maximum of the campus cluster's secondary queue.
+- `qsub` those jobs.
 
