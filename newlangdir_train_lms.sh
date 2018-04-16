@@ -44,9 +44,11 @@ mkdir -p $dir
 cleantext=$dir/text.no_oov
 tmp=$dir/tmp
 
+# In awk, print appends \n but printf doesn't.
+
 echo "$0: converting $text and $lexicon into LM training data..."
-awk -v lex=$lexicon 'BEGIN{while((getline<lex) >0){ seen[$1]=1; } } 
-  {for(n=1; n<=NF;n++) { if (seen[$n]) { printf("%s ", $n); } else {print("<unk> ");} } print("\n");}' \
+awk -v lex=$lexicon 'BEGIN{while((getline<lex) >0){ seen[$1]=1; } }
+  {for(n=1;n<=NF;n++) { if (seen[$n]) {printf("%s ", $n);} else {printf("<unk> ");}} print "";}' \
   < $text > $cleantext || exit 1
 
 rm -rf $tmp
@@ -66,7 +68,7 @@ awk '{print $2}' < $dir/unigram.counts | get_word_map.pl "<s>" "</s>" "<unk>" > 
 
 # Ignore train.txt's first field, the utterance-id.
 awk -v wmap=$dir/word_map 'BEGIN{while((getline<wmap)>0)map[$1]=$2;}
-  { for(n=2;n<=NF;n++) { print map[$n]; if(n<NF){ print " "; } else { print ""; }}}' \
+  {for(n=2;n<=NF;n++) { print map[$n]; if(n<NF){print " ";} else {print "";}}}' \
   < $cleantext | gzip -c > $dir/train.gz || exit 1
 
 echo "$0: running train_lm.sh..."
