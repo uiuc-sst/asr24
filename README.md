@@ -38,12 +38,12 @@ It goes into a directory `asr24`, a sister of the usual `s5` directory.
 ```
 This builds the subdirectories `data` and `exp`.  Its last command `mkgraph.sh` can take 45 minutes and use a lot of memory because it calls `fstdeterminizestar` on a large language model, as Dan Povey [explains](https://groups.google.com/forum/#!topic/kaldi-help/3C6ypvqLpCw).
 
-- Verify that it can transcribe a recording of English speech.
-Either use the provided **8khz.wav**,
-or `sox MySpeech.wav -r 8000` **`8khz.wav`**,
-or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000` **`8khz.wav`**.
+- Verify that it can transcribe a recording of English speech, in mono 16-bit 8 kHz .wav format.
+Either use the provided 8khz.wav,
+or `sox MySpeech.wav -r 8000 8khz.wav`,
+or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000 8khz.wav`.
 
-(The scripts `cmd.sh` and `path.sh` let the shell find `kaldi/src/online2bin/online2-wav-nnet3-latgen-faster`.)
+(The scripts `cmd.sh` and `path.sh` say where to find `kaldi/src/online2bin/online2-wav-nnet3-latgen-faster`.)
 ```
     . cmd.sh && . path.sh
     online2-wav-nnet3-latgen-faster \
@@ -61,7 +61,7 @@ or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000` **`8khz.wav`**.
 ```
 
 #### Transcribe the IL speech.
-- `./newlangdir_train_lms.sh` makes a language model for the IL.
+- `./newlangdir_train_lms.sh <IL>` makes a language model for the IL.
 - `./newlangdir_make_graphs.sh <IL>`, probably on ifp-53, makes L.fst, G.fst, and then an IL-customized HCLG.fst.
 - `./mkscp.py` splits the transcription tasks into jobs shorter than the 30 minute maximum of the campus cluster's secondary queue.
 - `qsub` those jobs.
