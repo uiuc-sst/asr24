@@ -22,7 +22,7 @@ if len(sys.argv) != 8:
 dummy, fileIntxt, fileIndict, fileOuttxt, fileOutdict, fileWords, filePhones, fileMissingchars = sys.argv
 
 # Read fileIndict.
-g2p = [];
+g2p = []
 phoneset = {}
 with open(fileIndict, 'r', encoding='utf-8') as f:
     for line in f:
@@ -65,28 +65,24 @@ with open(fileIntxt, 'r', encoding='utf-8') as f:
                                 word = word[n:]
                                 break
                     if rec:
-                        prondict[''.join(rec)] = pron
-                        outwords.append(''.join(rec))
+                        rec = ''.join(rec)
+                        prondict[rec] = pron
+                        outwords.append(rec)
             if outwords:
                 g.write(' '.join(outwords) + '\n')
 
-# Eliminate the unwanted blank word.
-if '' in prondict:
-    del prondict['']
-    
 # Write the dictionary.
 with open(fileOutdict, 'w', encoding='utf-8') as f:
     print('Writing {}'.format(fileOutdict))
     for (k,v) in sorted(prondict.items()):
-        if k:
-            f.write('%s %s\n' % (k,v))
+        f.write('%s %s\n' % (k,v))
 
 # Write the list of missing chars.
 with open(fileMissingchars, 'w', encoding='utf-8') as f:
     print('Writing {}'.format(fileMissingchars))
-    for k in missingchars.keys():
+    for k in sorted(missingchars.keys()):
         f.write(k + '\n')
-        
+
 # Write the list of words.
 with open(fileWords, 'w', encoding='utf-8') as f:
     print('Writing {}'.format(fileWords))
