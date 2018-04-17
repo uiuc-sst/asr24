@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# Make an IL L.fst and G.fst.  Compose them with Aspire's HC.fst, to make an HCLG.fst.
 # Try this on ifp-53, because campus cluster lacks a UTF-8-compatible perl needed by utils/validate_dict_dir.pl, called by utils/prepare_lang.sh.
 # (Runs on a Mac in a few hours.  Much faster than Sequitur, a full weekend.)
 # Example inputs and outputs are /scratch/users/jhasegaw/kaldi/egs/aspire/s5/{russian,tamil} (5 GB and 1 GB).
@@ -9,7 +10,7 @@ if [ $# != 1 ]; then
   echo "Inputs and outputs are all in <newlangdir>."
   echo "Inputs: lang/clean.txt,"
   echo "        local/dict/{lexicon.txt, extra_questions.txt, nonsilence_phones.txt, optional_silence.txt, silence_phones.txt, topo, words.txt}."
-  echo "Intermediate outputs: local/dict/lexiconp.txt, dict/L.fst, lang/L.fst"
+  # Intermediate outputs: local/dict/lexiconp.txt, dict/L.fst, lang/L.fst, lang/G.fst.
   echo "Output: graph/HCLG.fst."
   echo "SRILM must be in your path."
   exit 1
@@ -18,8 +19,8 @@ fi
 newlangdir=$1
 
 # Set up environment variables.
-. cmd.sh
-. path.sh
+. cmd.sh || exit 1
+. path.sh || exit 1
 
 command -v ngram-count 1>/dev/null 2>&1 || { echo "$0: failed to find SRILM tools. Install SRILM and update path.sh."; exit 1; }
 
