@@ -24,7 +24,7 @@ dummy, fileIntxt, fileIndict, fileOuttxt, fileOutdict, fileWords, filePhones, fi
 # Read fileIndict.
 g2p = [];
 phoneset = {}
-with open(fileIndict) as f:
+with open(fileIndict, 'r', encoding='utf-8') as f:
     for line in f:
         words = line.rstrip().split()
         if len(words) > 1:
@@ -38,14 +38,14 @@ with open(fileIndict) as f:
 # Read fileIntxt, convert words, and write fileOuttxt.
 prondict = {}
 missingchars = {}
-with open(fileIntxt) as f:
-    with open(fileOuttxt, 'w') as g:
+with open(fileIntxt, 'r', encoding='utf-8') as f:
+    with open(fileOuttxt, 'w', encoding='utf-8') as g:
         print('Cleaning text from %s into %s.' % (fileIntxt, fileOuttxt))
         for line in f:
             outwords = []
             for word in re.split('\W+', line.upper()):
                 if word in prondict:
-                    outwords.append(test)
+                    outwords.append(word)
                 else:
                     rec = []
                     pron = ''
@@ -75,20 +75,20 @@ if '' in prondict:
     del prondict['']
     
 # Write the dictionary.
-with open(fileOutdict, 'w') as f:
+with open(fileOutdict, 'w', encoding='utf-8') as f:
     print('Writing {}'.format(fileOutdict))
     for (k,v) in sorted(prondict.items()):
         if k:
             f.write('%s %s\n' % (k,v))
 
 # Write the list of missing chars.
-with open(fileMissingchars, 'w') as f:
-    print('Writing {}'.format(missingchars))
+with open(fileMissingchars, 'w', encoding='utf-8') as f:
+    print('Writing {}'.format(fileMissingchars))
     for k in missingchars.keys():
         f.write(k + '\n')
         
 # Write the list of words.
-with open(fileWords, 'w') as f:
+with open(fileWords, 'w', encoding='utf-8') as f:
     print('Writing {}'.format(fileWords))
     for (n,w) in enumerate(sorted(prondict.keys())):
         f.write('{}\n'.format(w))
