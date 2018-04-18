@@ -12,7 +12,7 @@ if [ $# != 1 ]; then
   echo "Inputs: lang/clean.txt, local/dict/{lexicon.txt, extra_questions.txt, nonsilence_phones.txt, optional_silence.txt, silence_phones.txt, words.txt}."
   # Intermediate outputs: lang/topo == dict.topo (from prepare_lang.sh);
   #                       local/dict/lexiconp.txt; dict/L.fst == lang/L.fst; lang/G.fst; lang/lm.arpa.gz.
-  echo "Output: graph/HCLG.fst."
+  echo "Outputs: graph/HCLG.fst, conf/*.conf."
   echo "SRILM must be in your path."
   exit 1
 fi
