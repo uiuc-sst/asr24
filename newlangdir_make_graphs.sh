@@ -9,11 +9,9 @@
 if [ $# != 1 ]; then
   echo "Usage: $0 <newlangdir>" # e.g., $0 tamil, or $0 russian.
   echo "Inputs and outputs are all in <newlangdir>."
-  echo "Inputs: lang/clean.txt,"
-  echo "        local/dict/{lexicon.txt, extra_questions.txt, nonsilence_phones.txt, optional_silence.txt, silence_phones.txt, words.txt}."
-  # The files lang/topo and dict/topo may be inputs, but this script seems to tolerate their absence,
-  # despite calling prepare_lang.sh which calls validate_lang.pl which wants $lang/topo.
-  # Intermediate outputs: local/dict/lexiconp.txt; dict/L.fst copied to lang/L.fst; lang/G.fst; lang/lm.arpa.gz.
+  echo "Inputs: lang/clean.txt, local/dict/{lexicon.txt, extra_questions.txt, nonsilence_phones.txt, optional_silence.txt, silence_phones.txt, words.txt}."
+  # Intermediate outputs: lang/topo == dict.topo (from prepare_lang.sh);
+  #                       local/dict/lexiconp.txt; dict/L.fst == lang/L.fst; lang/G.fst; lang/lm.arpa.gz.
   echo "Output: graph/HCLG.fst."
   echo "SRILM must be in your path."
   exit 1
