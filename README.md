@@ -62,7 +62,7 @@ or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000 8khz.wav`.
 
 #### Transcribe the IL speech.
 - `./newlangdir_train_lms.sh <IL>` makes a language model for the IL.
-- `./mkprondict.py <IL>/train_all/text <IL>/local/dict/lexicon.txt <IL>/lang/clean.txt out.dict words.txt phones.txt missing.txt` makes files needed by newlangdir_make_graphs.sh.  (Should `out.dict` become a subset of `<IL>/local/dict/lexicon.txt`?  Should `out.dict`, `words.txt`, and `phones.txt` be moved into `<IL>/`?)
+- `./mkprondict.py <IL>/train_all/text g2aspire-<IL>.txt <IL>/lang/clean.txt out.dict words.txt phones.txt missing.txt` makes files needed by newlangdir_make_graphs.sh.  (Should `out.dict` become a subset of `<IL>/local/dict/lexicon.txt`?  Should `out.dict`, `words.txt`, and `phones.txt` be moved into `<IL>/`?)
 - `./newlangdir_make_graphs.sh <IL>`, probably on ifp-53, makes L.fst, G.fst, and then an IL-customized HCLG.fst.
 - `./mkscp.py` splits the transcription tasks into jobs shorter than the 30 minute maximum of the campus cluster's secondary queue.
 - `qsub` those jobs.

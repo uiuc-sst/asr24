@@ -1,24 +1,25 @@
 #!/usr/bin/env python3
 
-# Create a clean.txt (aka out.txt) with which to train a language model.
-# For each unique word in clean.txt, estimate a pronunciation from a g2p table;
-# store them in lexicon.txt.
+# Inputs:
+#   in.txt, raw IL prose; at most 60 MB (5M words, 500k lines) to keep this fast.
+#   in.g2aspire.dict, a g2p for IL using Aspire's phonemes.
+# Outputs:
+#   out.txt, a cleaned-up in.txt: keep only the chars in in.g2aspire.dict, and eliminate >2 repeated chars.
+#   out.dict, the words from out.txt, each with a pronunciation estimated from in.g2aspire.dict.
+# Other outputs:
+#   words.txt, out.txt's words.
+#   phones.txt, the phones used by words.txt.
+#   missing.txt, any characters in in.txt that were not in in.g2aspire.dict.
 
 import sys
 import os
 import re
 
-USAGE='''USAGE: mkprondict.py in.txt in.dict out.txt out.dict words.txt phones.txt missing.txt
-
-   Clean the words from in.txt: keep only the characters in in.dict, and eliminate >2 repeated chars.
-   Write cleaned text into out.txt; write the prondict into out.dict.
-   Write the word list and phone list into words.txt and phones.txt.
-   Into missing.txt, report any characters in in.txt that were not in in.dict.'''
+USAGE='''USAGE: mkprondict.py in.txt in.g2aspire.dict out.txt out.dict words.txt phones.txt missing.txt'''
 
 if len(sys.argv) != 8:
     print(USAGE)
     exit(0)
-
 dummy, fileIntxt, fileIndict, fileOuttxt, fileOutdict, fileWords, filePhones, fileMissingchars = sys.argv
 
 # Read fileIndict.

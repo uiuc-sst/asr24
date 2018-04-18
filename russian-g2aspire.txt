@@ -1,0 +1,208 @@
+а	aa
+аъ	aa
+аь	aa
+ба	b aa
+бо	b ow
+бэ 	b eh
+бу 	b uw
+бы	b ih
+бъ	b
+бя 	b ae
+бё 	b uh
+бе 	b ey
+бю 	b uw
+би	b iy
+бь	b
+б	b
+ва	v aa
+во	v ow
+вэ 	v eh
+ву 	v uw
+вы	v ih
+въ	v
+вя 	v ae
+вё 	v uh
+ве 	v ey
+вю 	v uw
+ви	v iy
+вь	v
+в	v
+г	g
+гь	g
+гъ	g
+да	d aa
+до	d ow
+дэ 	d eh
+ду 	d uw
+ды	d ih
+дъ	d
+дя 	d ae
+дё 	d uh
+де 	d ey
+дю 	d uw
+ди	d iy
+дь	d
+д	d
+е	y ey
+e	ey
+ё	jh ow
+ж	zh
+жь	zh
+жъ	zh
+за	z aa
+зо	z ow
+зэ 	z eh
+зу 	z uw
+зы	z ih
+зъ	z
+зя 	z ae
+зё 	z uh
+зе 	z ey
+зю 	z uw
+зи	z iy
+зь	z
+з	z
+и	iy
+й	y
+йь	y
+йъ	y
+ка	k aa
+ко	k ow
+кэ 	k eh
+ку 	k uw
+кы	k ih
+къ	k
+кя 	k  ae
+кё 	k  uh
+ке 	k  ey
+кю 	k  uw
+ки	k  iy
+кь	k
+к	k
+ла	l aa
+ло	l ow
+лэ 	l eh
+лу 	l uw
+лы	l ih
+лъ	l
+ля 	l  ae
+лё 	l  uh
+ле 	l  ey
+лю 	l  uw
+ли	l  iy
+ль	l
+л	l
+ма	m aa
+мо	m ow
+мэ 	m eh
+му 	m uw
+мы	m ih
+мъ	m
+мя 	m  ae
+мё 	m  uh
+ме 	m  ey
+мю 	m  uw
+ми	m  iy
+мь	m
+м	m
+на	n aa
+но	n ow
+нэ 	n eh
+ну 	n uw
+ны	n ih
+нъ	n
+ня 	n  ae
+нё 	n  uh
+не 	n  ey
+ню 	n  uw
+ни	n iy
+нь	n
+н	n
+о	ow
+оь	ow
+оъ	ow
+па	p aa
+по	p ow
+пэ 	p eh
+пу 	p uw
+пы	p ih
+пъ	p
+пя 	p  ae
+пё 	p  uh
+пе 	p  ey
+пю 	p  uw
+пи	p iy
+пь	p
+п	p
+ра	r aa
+ро	r ow
+рэ 	r eh
+ру 	r uw
+ры	r ih
+ръ	r
+ря 	r  ae
+рё 	r  uh
+ре 	r  ey
+рю 	r  uw
+ри	r iy
+рь	r
+р	r
+са	s aa
+со	s ow
+сэ 	s eh
+су 	s uw
+сы	s ih
+съ	s
+ся 	s  ae
+сё 	s  uh
+се 	s  ey
+сю 	s  uw
+си	s iy
+сь	s
+с	s
+та	t aa
+то	t ow
+тэ 	t eh
+ту 	t uw
+ты	t ih
+тъ	t
+тя 	t  ae
+тё 	t  uh
+те 	t  ey
+тю 	t  uw
+ти	t iy
+ть	t
+т	t
+у	uw
+фа	f aa
+фо	f ow
+фэ 	f eh
+фу 	f uw
+фы	f ih
+фъ	f
+фя 	f  ae
+фё 	f  uh
+фе 	f  ey
+фю 	f  uw
+фи	f iy
+фь	f
+ф	f
+х	k
+хь	k
+хъ	k
+ц	t s
+ць	t s
+цъ	t s
+ч	ch
+чь	ch
+чъ	ch
+ш	sh
+шь	sh
+шъ	sh
+щ	sh
+щь	sh
+щъ	sh
+ы	ih
+э	eh
+ю	y uw
+я	y aa

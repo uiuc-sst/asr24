@@ -1,0 +1,341 @@
+அ ah 
+ஆ aa
+இ ih
+ஈ iy
+உ uh
+ஊ uw
+எ eh
+ஏ ey
+ஐ ay
+ஒ ow
+ஓ ow
+ஔ ow
+க் hh
+க hh ah
+கா hh aa
+கி hh ih
+கீ hh iy
+கு hh uh
+கூ hh uw
+கெ hh eh
+கே hh ey
+கை hh ay
+கொ hh ow
+கோ hh ow
+கௌ hh aw
+ங் ng
+ங ng ah
+ஙா ng aa
+ஙி ng ih
+ஙீ ng iy
+ஙு ng uh
+ஙூ ng uw
+ஙெ ng eh
+ஙே ng ey
+ஙை ng ay
+ஙொ ng ow
+ஙோ ng ow
+ஙௌ ng aw
+ச் ch
+ச ch ah
+சா ch aa
+சி ch ih
+சீ ch iy
+சு ch uh
+சூ ch uw
+செ ch eh
+சே ch ey
+சை ch ay
+சொ ch ow
+சோ ch ow
+சௌ ch aw
+ஞ் n
+ஞ n ah
+ஞா n aa
+ஞி n ih
+ஞீ n iy
+ஞு n uh
+ஞூ n uw
+ஞெ n eh
+ஞே n ey
+ஞை n ay
+ஞொ n ow
+ஞோ n ow
+ஞௌ n aw
+ட் t
+ட t ah
+டா t aa
+டி t ih
+டீ t iy
+டு t uh
+டூ t uw
+டெ t eh
+டே t ey
+டை t ay
+டொ t ow
+டோ t ow
+டௌ t aw
+ண் n
+ண n ah
+ணா n aa
+ணி n ih
+ணீ n iy
+ணு n uh
+ணூ n uw
+ணெ n eh
+ணே n ey
+ணை n ay
+ணொ n ow
+ணோ n ow
+ணௌ n aw
+த் t
+த t ah
+தா t aa
+தி t ih
+தீ t iy
+து t uh
+தூ t uw
+தெ t eh
+தே t ey
+தை t ay
+தொ t ow
+தோ t ow
+தௌ t aw
+ந் n
+ந n ah
+நா n aa
+நி n ih
+நீ n iy
+நு n uh
+நூ n uw
+நெ n eh
+நே n ey
+நை n ay
+நொ n ow
+நோ n ow
+நௌ n aw
+ப் p
+ப p ah
+பா p aa
+பி p ih
+பீ p iy
+பு p uh
+பூ p uw
+பெ p eh
+பே p ey
+பை p ay
+பொ p ow
+போ p ow
+பௌ p aw
+ம் m
+ம m ah
+மா m aa
+மி m ih
+மீ m iy
+மு m uh
+மூ m uw
+மெ m eh
+மே m ey
+மை m ay
+மொ m ow
+மோ m ow
+மௌ m aw
+ய் y
+ய y ah
+யா y aa
+யி y ih
+யீ y iy
+யு y uh
+யூ y uw
+யெ y eh
+யே y ey
+யை y ay
+யொ y ow
+யோ y ow
+யௌ y aw
+ர் r
+ர r ah
+ரா r aa
+ரி r ih
+ரீ r iy
+ரு r uh
+ரூ r uw
+ரெ r eh
+ரே r ey
+ரை r ay
+ரொ r ow
+ரோ r ow
+ரௌ r aw
+ல் l
+ல l ah
+லா l aa
+லி l ih
+லீ l iy
+லு l uh
+லூ l uw
+லெ l eh
+லே l ey
+லை l ay
+லொ l ow
+லோ l ow
+லௌ l aw
+வ் w
+வ w ah
+வா w aa
+வி w ih
+வீ w iy
+வு w uh
+வூ w uw
+வெ w eh
+வே w ey
+வை w ay
+வொ w ow
+வோ w ow
+வௌ w aw
+ழ் r
+ழ r ah
+ழா r aa
+ழி r ih
+ழீ r iy
+ழு r uh
+ழூ r uw
+ழெ r eh
+ழே r ey
+ழை r ay
+ழொ r ow
+ழோ r ow
+ழௌ r aw
+ள் l
+ள l ah
+ளா l aa
+ளி l ih
+ளீ l iy
+ளு l uh
+ளூ l uw
+ளெ l eh
+ளே l ey
+ளை l ay
+ளொ l ow
+ளோ l ow
+ளௌ l aw
+ற் r
+ற r ah
+றா r aa
+றி r ih
+றீ r iy
+று r uh
+றூ r uw
+றெ r eh
+றே r ey
+றை r ay
+றொ r ow
+றோ r ow
+றௌ r aw
+ன் n
+ன n ah
+னா n aa
+னி n ih
+னீ n iy
+னு n uh
+னூ n uw
+னெ n eh
+னே n ey
+னை n ay
+னொ n ow
+னோ n ow
+னௌ n aw
+ஶ் sh
+ஶ sh ah
+ஶா sh aa
+ஶி sh ih
+ஶீ sh iy
+ஶு sh uh
+ஶூ sh uw
+ஶெ sh eh
+ஶே sh ey
+ஶை sh ay
+ஶொ sh ow
+ஶோ sh ow
+ஶௌ sh aw
+ஜ் jh
+ஜ jh ah
+ஜா jh aa
+ஜி jh ih
+ஜீ jh iy
+ஜு jh uh
+ஜூ jh uw
+ஜெ jh eh
+ஜே jh ey
+ஜை jh ay
+ஜொ jh ow
+ஜோ jh ow
+ஜௌ jh aw
+ஷ் sh
+ஷ sh ah
+ஷா sh aa
+ஷி sh ih
+ஷீ sh iy
+ஷு sh uh
+ஷூ sh uw
+ஷெ sh eh
+ஷே sh ey
+ஷை sh ay
+ஷொ sh ow
+ஷோ sh ow
+ஷௌ sh aw
+ஸ் s
+ஸ s ah
+ஸா s aa
+ஸி s ih
+ஸீ s iy
+ஸு s uh
+ஸூ s uw
+ஸெ s eh
+ஸே s ey
+ஸை s ay
+ஸொ s ow
+ஸோ s ow
+ஸௌ s aw
+ஹ் hh
+ஹ hh ah
+ஹா hh aa
+ஹி hh ih
+ஹீ hh iy
+ஹு hh uh
+ஹூ hh uw
+ஹெ hh eh
+ஹே hh ey
+ஹை hh ay
+ஹொ hh ow
+ஹோ hh ow
+ஹௌ hh aw
+க்ஷ் k sh
+க்ஷ k sh ah
+க்ஷா k sh aa
+க்ஷி k sh ih
+க்ஷீ k sh iy
+க்ஷு k sh uh
+க்ஷூ k sh uw
+க்ஷெ k sh eh
+க்ஷே k sh ey
+க்ஷை k sh ay
+க்ஷொ k sh ow
+க்ஷோ k sh ow
+க்ஷௌ k sh aw
+௦	s uw l iy y ah m
+௧	ow n r uw
+௨	iy r ah n t uw
+௩	m uw n r uw
+௪	n aa n k uw
+௫	ay n t uw
+௬	aa r uw
+௭	ey l uw
+௮	eh t uw
+௯	ow n p aa t uw
+௰	p aa t uw
+௱	n uw r uw
+௲	aa r iy y ah m
+ை 	ay
+ூ 	uw
+ீ	uh
+ௌ	aw
