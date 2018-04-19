@@ -44,14 +44,11 @@ with open(fileIntxt, 'r', encoding='utf-8') as f:
         print('Cleaning text from %s into %s.' % (fileIntxt, fileOuttxt))
         for line in f:
             outwords = []
-            #print('\nCleaning:    ' + line) # first, from the shell, do: export PYTHONIOENCODING=utf-8
             # Regex \d\s works better than \W in python 3.4.3
             for word in re.split('[\d\s]+', line.strip().upper()):
                 if word in prondict:
-                    #print('\tFound:      ' + word)
                     outwords.append(word)
                 elif word:
-                    #print('\tNotfound:   ' + word)
                     rec = []
                     pron = ''
                     while word:
@@ -71,7 +68,6 @@ with open(fileIntxt, 'r', encoding='utf-8') as f:
                                 break
                     if rec:
                         rec = ''.join(rec)
-                        #print('\t  Substr:   ' + rec)
                         prondict[rec] = pron
                         outwords.append(rec)
             if outwords:

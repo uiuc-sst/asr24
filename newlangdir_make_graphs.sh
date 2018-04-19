@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Make an IL L.fst and G.fst.  Compose them with Aspire's HC.fst, to make an HCLG.fst.
-# Try this on ifp-53, because campus cluster lacks a UTF-8-compatible perl needed by utils/validate_dict_dir.pl, called by utils/prepare_lang.sh.
+# Run this on ifp-53, because campus cluster lacks a UTF-8-compatible perl needed by utils/validate_dict_dir.pl, called by utils/prepare_lang.sh.
 # (Runs on a Mac in a few hours.  Much faster than Sequitur, a full weekend.)
 # Runs Tamil on ifp-53 singlecore in 13 minutes.
 # Example inputs and outputs are /scratch/users/jhasegaw/kaldi/egs/aspire/s5/{russian,tamil} (5 GB and 1 GB).

@@ -11,7 +11,7 @@
 if [ $# != 1 ]; then
   echo "Usage: $0 <newlangdir>" # e.g., $0 tamil, or $0 russian.
   echo "Inputs and outputs are all in <newlangdir>."
-  echo "Inputs: local/dict/lexicon.txt, train_all/text."
+  echo "Inputs: local/dict/lexicon.txt, lang/clean.txt."
   # Intermediate outputs: local/lm/{text.no_oov, word.counts, unigram.counts, word_map, train.gz, wordlist.mapped}
   echo "Output: local/lm/3gram-mincount/lm_unpruned.gz."
   # Output, from train_lm.sh at the end of this script, also includes
@@ -21,7 +21,7 @@ fi
 [ ! -d $1 ] && echo "$0: missing directory $1. Aborting." && exit 1
 newlangdir=$1
 
-text=$newlangdir/train_all/text
+text=$newlangdir/lang/clean.txt
 lexicon=$newlangdir/local/dict/lexicon.txt
 for f in "$text" "$lexicon"; do
   [ ! -f $f ] && echo "$0: missing file $f. Aborting." && exit 1
