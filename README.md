@@ -61,7 +61,8 @@ or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000 8khz.wav`.
 ```
 
 #### Transcribe the IL speech.
-- `./mkprondict.py <IL>/train_all/text g2aspire-<IL>.txt <IL>/lang/clean.txt <IL>/local/dict/lexicon.txt <IL>/local/dict/words.txt <IL>/local/dict/nonsilence_phones.txt <IL>/train_all/letters-culled-by-cleaning.txt` makes files needed by the subsequent steps.
+- `./mkprondict.py <IL>/train_all/text g2aspire-<IL>.txt <IL>/lang/clean.txt <IL>/local/dict/lexicon.txt <IL>/local/dict/words.txt /tmp/phones.txt /tmp/letters-culled-by-cleaning.txt` makes files needed by the subsequent steps (but the /tmp files aren't used).  
+  (`/tmp/phones.txt` is a subset of `<IL>/local/dict/nonsilence_phones.txt`, which is the standard Aspire version.)
 - `./newlangdir_train_lms.sh <IL>` makes a language model for the IL.
 - `./newlangdir_make_graphs.sh <IL>`, probably on ifp-53, makes L.fst, G.fst, and then an IL-customized HCLG.fst.
 - `./mkscp.py` splits the transcription tasks into jobs shorter than the 30 minute maximum of the campus cluster's secondary queue.

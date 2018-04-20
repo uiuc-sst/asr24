@@ -47,6 +47,7 @@ with open(fileIntxt, 'r', encoding='utf-8') as f:
             # Regex \d\s works better than \W in python 3.4.3
             for word in re.split('[\d\s]+', line.strip().upper()):
                 if word in prondict:
+                    # This word already appeared in fileIntxt.
                     outwords.append(word)
                 elif word:
                     rec = []
