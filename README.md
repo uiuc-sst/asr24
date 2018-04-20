@@ -65,5 +65,5 @@ or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000 8khz.wav`.
   (`/tmp/phones.txt` is a subset of `<IL>/local/dict/nonsilence_phones.txt`, which is the standard Aspire version.)
 - `./newlangdir_train_lms.sh <IL>` makes a language model for the IL.
 - `./newlangdir_make_graphs.sh <IL>`, probably on ifp-53, makes L.fst, G.fst, and then an IL-customized HCLG.fst.
-- `./mkscp.py` splits the transcription tasks into jobs shorter than the 30 minute maximum of the campus cluster's secondary queue.
-- `qsub` those jobs.
+- `./mkscp.py <IL-8khz> 20 <IL>` splits the transcription tasks into jobs shorter than the 30-minute maximum of the campus cluster's secondary queue.  `<IL-8khz>` is the dir of 8 kHz speech files, each named something like TAM_EVAL_072_008.wav.  `20` is the number of jobs.  This creates a shell script for each job, `<IL>/cmd/<IL>_42.sh`.
+- On the campus cluster, for each job foo.sh, ``qsub -q secondary -d `pwd` -l nodes=1` foo.sh``.
