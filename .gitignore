@@ -1,5 +1,10 @@
-# These dirs are built by scripts in here.
+# Dirs built by scripts in here.
 data
 exp
-# This is extracted from http://dl.kaldi-asr.org/models/0001_aspire_chain_model.tar.gz
+# Scripts built by mkscp.py.
+*-submit.sh
+# STDERR and STDOUT of jobs submitted to the campus cluster by *-submit.h.
+*.sh.e*
+*.sh.o*
+# Extracted from http://dl.kaldi-asr.org/models/0001_aspire_chain_model.tar.gz.
 README.txt
