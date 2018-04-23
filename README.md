@@ -66,4 +66,4 @@ or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000 8khz.wav`.
 - `./newlangdir_train_lms.sh $L` makes a language model for L.
 - `./newlangdir_make_graphs.sh $L`, probably on ifp-53, makes L.fst, G.fst, and then an L-customized HCLG.fst.
 - `./mkscp.py $L-8khz 20 $L` splits the transcription tasks into jobs shorter than the 30-minute maximum of the campus cluster's secondary queue.  `$L-8khz` is the dir of 8 kHz speech files, each named something like TAM_EVAL_072_008.wav.  `20` is the number of jobs.  This creates a shell script for each job, `$L/cmd/$L_42.sh`.
-- On the campus cluster, for each job foo.sh, ``qsub -q secondary -d `pwd` -l nodes=1` foo.sh``.
+- On the campus cluster, for each job foo.sh, `qsub -q secondary -d $PWD -l nodes=1 foo.sh`.
