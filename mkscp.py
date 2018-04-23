@@ -19,9 +19,6 @@ num_jobs = int(num_jobs)
 if num_jobs < 1:
     print(USAGE)
     exit(1)
-if not os.path.exists(lang):
-    print('mkscp.py: missing directory ' + lang)
-    exit(1)
 if not os.path.exists(data_dir):
     print('mkscp.py: missing directory ' + data_dir)
     exit(1)
@@ -32,6 +29,8 @@ if not ids:
     print('mkscp.py: no .wav files in directory ' + data_dir)
     exit(1)
 
+if not os.path.exists(lang):
+    os.mkdir(lang)
 scp_base = lang + '/scp/'
 if not os.path.exists(scp_base):
     os.mkdir(scp_base)
@@ -53,9 +52,10 @@ for n in range(0, num_jobs):
     with open(scpfilename, 'w') as f:
         with open(spk2uttfilename, 'w') as g:
             for m in range(math.ceil(n*num_per_scp), min(len(wavfiles), math.ceil((n+1)*num_per_scp))):
-                f.write('{}\t{}/{}\n'.format(ids[m], data_dir, wavfiles[m]))
+                f.write('{}\t{}{}\n'.format(ids[m], data_dir, wavfiles[m]))
                 g.write('{}\t{}\n'.format(ids[m], ids[m]))
 
     with open(cmdfilename, 'w') as h:
-        cmd = "{} 'ark:{}' 'scp:{}' 'ark:/dev/null'\n".format(basic_cmd, spk2uttfilename,  scpfilename)
+        cmd = "{} 'ark:{}' 'scp:{}' 'ark:/dev/null'\n".format(basic_cmd, spk2uttfilename, scpfilename)
         h.write('. cmd.sh\n. path.sh\n{}'.format(cmd))
+    os.chmod(cmdfilename, 0o775)
