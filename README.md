@@ -75,7 +75,7 @@ On ifp-serv-03.ifp.illinois.edu, get LDC speech:
 Then, on the campus cluster:
 ```
     cd /projects/beckman/jhasegaw/kaldi/egs/aspire/asr24
-    wget -qO- http://www.ifp.illinois.edu/~camilleg/e/8k.tar | tar xf
+    wget -qO- http://www.ifp.illinois.edu/~camilleg/e/8k.tar | tar xf -
     mv 8k $L-8khz
 ```
 
@@ -83,11 +83,15 @@ Then, on the campus cluster:
 - `./mkprondict.py $L/train_all/text g2aspire-$L.txt $L/lang/clean.txt $L/local/dict/lexicon.txt $L/local/dict/words.txt /tmp/phones.txt /tmp/letters-culled-by-cleaning.txt` makes files needed by the subsequent steps (but the /tmp files aren't used).  
   (`/tmp/phones.txt` is a subset of `$L/local/dict/nonsilence_phones.txt`, which is the standard Aspire version.)
 - `./newlangdir_train_lms.sh $L` makes a language model for L.
-- `./newlangdir_make_graphs.sh $L`, probably on ifp-53, makes L.fst, G.fst, and then an L-customized HCLG.fst.
+- On ifp-53, `./newlangdir_make_graphs.sh $L` makes L.fst, G.fst, and then an L-customized HCLG.fst and some config files.
+- `tar cf ~camilleg/l/eval/confs.tar -C $L conf` copies the config files for wget retrieval.
+Unfortunately HCLG.fst is too big to do that smoothly; it needs to be scp'd into the cluster:
+- On ifp-53, `scp $L/graph/HCLG.fst cog@golubh1.campuscluster.illinois.edu:/projects/beckman/jhasegaw/kaldi/egs/aspire/asr24/$L/graph/HCLG.fst`
 
 On the campus cluster:
+- `(cd $L; wget -qO- http://www.ifp.illinois.edu/~camilleg/e/confs.tar | tar xf -; chmod -R a+r conf)`
 - `./mkscp.py $L-8khz 20 $L` splits the transcription tasks into jobs shorter than the 30-minute maximum of the campus cluster's secondary queue.
-Its input is `$L-8khz`, a dir of 8 kHz speech files, each named something like TAM_EVAL_072_008.wav.
-`20` is the number of jobs.
-Its output is shell script for each job, `$L/cmd/$L_42.sh`.
+Its reads `$L-8khz`, a dir of 8 kHz speech files, each named something like TAM_EVAL_072_008.wav.
+`20` is the number of jobs, found empirically.
+It makes the following shell script. 
 - `./$L-submit.sh` launches all these jobs.
