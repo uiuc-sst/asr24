@@ -60,10 +60,34 @@ or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000 8khz.wav`.
       'ark:/dev/null'
 ```
 
+#### Get the speech recordings.
+On ifp-serv-03.ifp.illinois.edu, get LDC speech:
+```
+    cd /ws/ifp-serv-03_1/workspace/fletcher/fletcher1/speech_data1/Russian/LDC2016E111/RUS_20160930
+    cd /ws/ifp-serv-03_1/workspace/fletcher/fletcher1/speech_data1/Tamil/TAM_EVAL_20170601/TAM_EVAL_20170601
+    cd /ws/ifp-serv-03_1/workspace/fletcher/fletcher1/speech_data1/Uzbek/LDC2016E66/UZB_20160711
+
+    mkdir /tmp/8k
+    for f in */AUDIO/*.flac; do sox "$f" -r 8000 -c 1 /tmp/8k/$(basename ${f%.*}.wav); done
+    tar cf /workspace/ifp-53_1-data/eval/8k.tar -C /tmp 8k
+    rm -rf /tmp/8k
+```
+Then, on the campus cluster:
+```
+    cd /projects/beckman/jhasegaw/kaldi/egs/aspire/asr24
+    wget -qO- http://www.ifp.illinois.edu/~camilleg/e/8k.tar | tar xf
+    mv 8k $L-8khz
+```
+
 #### Transcribe the speech.
 - `./mkprondict.py $L/train_all/text g2aspire-$L.txt $L/lang/clean.txt $L/local/dict/lexicon.txt $L/local/dict/words.txt /tmp/phones.txt /tmp/letters-culled-by-cleaning.txt` makes files needed by the subsequent steps (but the /tmp files aren't used).  
   (`/tmp/phones.txt` is a subset of `$L/local/dict/nonsilence_phones.txt`, which is the standard Aspire version.)
 - `./newlangdir_train_lms.sh $L` makes a language model for L.
 - `./newlangdir_make_graphs.sh $L`, probably on ifp-53, makes L.fst, G.fst, and then an L-customized HCLG.fst.
-- `./mkscp.py $L-8khz 20 $L` splits the transcription tasks into jobs shorter than the 30-minute maximum of the campus cluster's secondary queue.  `$L-8khz` is the dir of 8 kHz speech files, each named something like TAM_EVAL_072_008.wav.  `20` is the number of jobs.  This creates a shell script for each job, `$L/cmd/$L_42.sh`.
-- On the campus cluster, for each job foo.sh, `qsub -q secondary -d $PWD -l nodes=1 foo.sh`.
+
+On the campus cluster:
+- `./mkscp.py $L-8khz 20 $L` splits the transcription tasks into jobs shorter than the 30-minute maximum of the campus cluster's secondary queue.
+Its input is `$L-8khz`, a dir of 8 kHz speech files, each named something like TAM_EVAL_072_008.wav.
+`20` is the number of jobs.
+Its output is shell script for each job, `$L/cmd/$L_42.sh`.
+- `./$L-submit.sh` launches all these jobs.
