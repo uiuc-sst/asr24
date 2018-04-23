@@ -45,17 +45,23 @@ num_per_scp = len(wavfiles)/num_jobs
 
 basic_cmd = 'online2-wav-nnet3-latgen-faster --online=false --frame-subsampling-factor=3 --config={}/conf/online.conf --max-active=7000 --beam=15.0 --lattice-beam=6.0 --acoustic-scale=1.0 --word-symbol-table={}/graph/words.txt exp/tdnn_7b_chain_online/final.mdl {}/graph/HCLG.fst'.format(lang,lang,lang)
 
-for n in range(0, num_jobs):
-    scpfilename = '%s%s%2.2d.txt' % (scp_base, lang, n)
-    spk2uttfilename = '%s%s%2.2d.txt' % (spk2utt_base, lang, n)
-    cmdfilename = '%s%s%2.2d.sh' % (cmd_base, lang, n)
-    with open(scpfilename, 'w') as f:
-        with open(spk2uttfilename, 'w') as g:
-            for m in range(math.ceil(n*num_per_scp), min(len(wavfiles), math.ceil((n+1)*num_per_scp))):
-                f.write('{}\t{}{}\n'.format(ids[m], data_dir, wavfiles[m]))
-                g.write('{}\t{}\n'.format(ids[m], ids[m]))
+cmd_submit = lang + '-submit.sh'
+with open(cmd_submit, 'w') as j:
+    j.write('#!/usr/bin/env bash\n')
+    for n in range(0, num_jobs):
+        scpfilename = '%s%s%2.2d.txt' % (scp_base, lang, n)
+        spk2uttfilename = '%s%s%2.2d.txt' % (spk2utt_base, lang, n)
+        cmdfilename = '%s%s%2.2d.sh' % (cmd_base, lang, n)
+        with open(scpfilename, 'w') as f:
+            with open(spk2uttfilename, 'w') as g:
+                for m in range(math.ceil(n*num_per_scp), min(len(wavfiles), math.ceil((n+1)*num_per_scp))):
+                    f.write('{}\t{}{}\n'.format(ids[m], data_dir, wavfiles[m]))
+                    g.write('{}\t{}\n'.format(ids[m], ids[m]))
 
-    with open(cmdfilename, 'w') as h:
-        cmd = "{} 'ark:{}' 'scp:{}' 'ark:/dev/null'\n".format(basic_cmd, spk2uttfilename, scpfilename)
-        h.write('. cmd.sh\n. path.sh\n{}'.format(cmd))
-    os.chmod(cmdfilename, 0o775)
+        with open(cmdfilename, 'w') as h:
+            cmd = "{} 'ark:{}' 'scp:{}' 'ark:/dev/null'\n".format(basic_cmd, spk2uttfilename, scpfilename)
+            h.write('. cmd.sh\n. path.sh\n{}'.format(cmd))
+        os.chmod(cmdfilename, 0o775)
+        j.write('qsub -q secondary -d $PWD -l nodes=1 {}\n'.format(cmdfilename))
+    j.write('qstat -u cog\n')
+os.chmod(cmd_submit, 0o775)
