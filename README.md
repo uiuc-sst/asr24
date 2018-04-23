@@ -1,11 +1,11 @@
 # asr24
 24-hour ASR
 
-Within 24 hours, train an ASR for a surprise incident language (IL), and get native transcriptions of recorded speech.
+Within 24 hours, train an ASR for a surprise language L, and get native transcriptions of recorded speech.
 
-Use a pre-trained acoustic model, an IL dictionary, and an IL language model.
-This approach converts phones directly to IL words, instead of using multiple cross-trained ASRs to make English words
-from which phone strings are extracted, merged with [PTgen](https://github.com/uiuc-sst/PTgen), and reconstituted into IL words (which turned out to be too noisy).
+Use a pre-trained acoustic model, an L pronunciation dictionary, and an L language model.
+This approach converts phones directly to L words, instead of using multiple cross-trained ASRs to make English words
+from which phone strings are extracted, merged with [PTgen](https://github.com/uiuc-sst/PTgen), and reconstituted into L words (which turned out to be too noisy).
 
 ## How to install
 
@@ -60,10 +60,10 @@ or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000 8khz.wav`.
       'ark:/dev/null'
 ```
 
-#### Transcribe the IL speech.
-- `./mkprondict.py <IL>/train_all/text g2aspire-<IL>.txt <IL>/lang/clean.txt <IL>/local/dict/lexicon.txt <IL>/local/dict/words.txt /tmp/phones.txt /tmp/letters-culled-by-cleaning.txt` makes files needed by the subsequent steps (but the /tmp files aren't used).  
-  (`/tmp/phones.txt` is a subset of `<IL>/local/dict/nonsilence_phones.txt`, which is the standard Aspire version.)
-- `./newlangdir_train_lms.sh <IL>` makes a language model for the IL.
-- `./newlangdir_make_graphs.sh <IL>`, probably on ifp-53, makes L.fst, G.fst, and then an IL-customized HCLG.fst.
-- `./mkscp.py <IL-8khz> 20 <IL>` splits the transcription tasks into jobs shorter than the 30-minute maximum of the campus cluster's secondary queue.  `<IL-8khz>` is the dir of 8 kHz speech files, each named something like TAM_EVAL_072_008.wav.  `20` is the number of jobs.  This creates a shell script for each job, `<IL>/cmd/<IL>_42.sh`.
+#### Transcribe the speech.
+- `./mkprondict.py $L/train_all/text g2aspire-$L.txt $L/lang/clean.txt $L/local/dict/lexicon.txt $L/local/dict/words.txt /tmp/phones.txt /tmp/letters-culled-by-cleaning.txt` makes files needed by the subsequent steps (but the /tmp files aren't used).  
+  (`/tmp/phones.txt` is a subset of `$L/local/dict/nonsilence_phones.txt`, which is the standard Aspire version.)
+- `./newlangdir_train_lms.sh $L` makes a language model for L.
+- `./newlangdir_make_graphs.sh $L`, probably on ifp-53, makes L.fst, G.fst, and then an L-customized HCLG.fst.
+- `./mkscp.py $L-8khz 20 $L` splits the transcription tasks into jobs shorter than the 30-minute maximum of the campus cluster's secondary queue.  `$L-8khz` is the dir of 8 kHz speech files, each named something like TAM_EVAL_072_008.wav.  `20` is the number of jobs.  This creates a shell script for each job, `$L/cmd/$L_42.sh`.
 - On the campus cluster, for each job foo.sh, ``qsub -q secondary -d `pwd` -l nodes=1` foo.sh``.
