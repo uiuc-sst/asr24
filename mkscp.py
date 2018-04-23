@@ -60,7 +60,9 @@ with open(cmd_submit, 'w') as j:
 
         with open(cmdfilename, 'w') as h:
             cmd = "{} 'ark:{}' 'scp:{}' 'ark:/dev/null'\n".format(basic_cmd, spk2uttfilename, scpfilename)
-            h.write('. cmd.sh\n. path.sh\n{}'.format(cmd))
+            h.write('. cmd.sh\n. path.sh\n')
+            h.write('module unload gcc/4.7.1 gcc/4.9.2\n module load python/2\n module swap gcc/6.2.0 gcc/7.2.0 \n')
+            h.write(cmd + '\n')
         os.chmod(cmdfilename, 0o775)
         j.write('qsub -q secondary -d $PWD -l nodes=1 {}\n'.format(cmdfilename))
     j.write('qstat -u cog\n')
