@@ -68,6 +68,8 @@ with open(cmd_submit, 'w') as j:
             h.write('. cmd.sh\n. path.sh\n')
             if qsub:
                 h.write('module unload gcc/4.7.1 gcc/4.9.2\nmodule load python/2\nmodule swap gcc/6.2.0 gcc/7.2.0\n')
+                # "module show python/2" also loads gcc/6.2.0.
+                # Then swap that with gcc/7.2.0, for GLIBCXX_3.4.23.
             h.write(cmd + '\n')
         os.chmod(cmdfilename, 0o775)
         if qsub:
