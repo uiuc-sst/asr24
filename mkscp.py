@@ -4,14 +4,11 @@
 # lang/scp/\d\d.txt, lang/cmd/\d\d.sh, and lang/spk2utt/\d\d.txt.
 # From data_dir, use only the .wav files; ignore other files.
 
-import sys
-import os
-import re
-import math
+import sys, glob, os, re, math, distutils.spawn
 
 USAGE='''USAGE: mkscp.py data_dir num_jobs lang_dir'''
 
-if len(sys.argv) < 4 or not sys.argv[2].isdigit():
+if len(sys.argv) < 4 or not sys.argv[2].isdecimal():
     print(USAGE)
     exit(1)
 dummy, data_dir, num_jobs, lang = sys.argv
@@ -41,6 +38,14 @@ cmd_base = lang + '/cmd/'
 if not os.path.exists(cmd_base):
     os.mkdir(cmd_base)
 
+# Remove previously made files.
+for f in glob.glob(scp_base + '*') + glob.glob(spk2utt_base + '*') + glob.glob(cmd_base + '*'):
+    os.remove(f)
+
+# Write slightly different files, depending on if this host has qsub or not.
+# Python 3.3 has a better test, shutil.which(), but campuscluster's python3 is only 3.2.
+qsub = distutils.spawn.find_executable("qsub") != None
+
 num_per_scp = len(wavfiles)/num_jobs
 
 basic_cmd = 'online2-wav-nnet3-latgen-faster --online=false --frame-subsampling-factor=3 --config={}/conf/online.conf --max-active=7000 --beam=15.0 --lattice-beam=6.0 --acoustic-scale=1.0 --word-symbol-table={}/graph/words.txt exp/tdnn_7b_chain_online/final.mdl {}/graph/HCLG.fst'.format(lang,lang,lang)
@@ -61,9 +66,14 @@ with open(cmd_submit, 'w') as j:
         with open(cmdfilename, 'w') as h:
             cmd = "{} 'ark:{}' 'scp:{}' 'ark:/dev/null'\n".format(basic_cmd, spk2uttfilename, scpfilename)
             h.write('. cmd.sh\n. path.sh\n')
-            h.write('module unload gcc/4.7.1 gcc/4.9.2\n module load python/2\n module swap gcc/6.2.0 gcc/7.2.0 \n')
+            if qsub:
+                h.write('module unload gcc/4.7.1 gcc/4.9.2\nmodule load python/2\nmodule swap gcc/6.2.0 gcc/7.2.0\n')
             h.write(cmd + '\n')
         os.chmod(cmdfilename, 0o775)
-        j.write('qsub -q secondary -d $PWD -l nodes=1 {}\n'.format(cmdfilename))
-    j.write('qstat -u cog\n')
+        if qsub:
+            j.write('qsub -q secondary -d $PWD -l nodes=1 {}\n'.format(cmdfilename))
+        else:
+            j.write('{} &\n'.format(cmdfilename))
+    if qsub:
+        j.write('qstat -u cog\n')
 os.chmod(cmd_submit, 0o775)

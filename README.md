@@ -96,3 +96,7 @@ Its reads `$L-8khz`, a dir of 8 kHz speech files, each named something like TAM_
 `20` is the number of jobs, found empirically.
 It makes the following shell script. 
 - `./$L-submit.sh` launches all these jobs.
+
+On ifp-53:
+- `./mkscp.py $L-8khz $(nproc) $L` splits the tasks into one job per CPU core.
+- `./$L-submit.sh 2> $L.out` launches all these jobs.
