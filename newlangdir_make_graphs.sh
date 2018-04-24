@@ -12,7 +12,7 @@ if [ $# != 1 ]; then
   echo "Inputs: lang/clean.txt, local/dict/{lexicon.txt, extra_questions.txt, nonsilence_phones.txt, optional_silence.txt, silence_phones.txt, words.txt}."
   # Intermediate outputs: lang/topo == dict.topo (from prepare_lang.sh);
   #                       local/dict/lexiconp.txt; dict/L.fst == lang/L.fst; lang/G.fst; lang/lm.arpa.gz.
-  echo "Outputs: graph/HCLG.fst, conf/*.conf."
+  echo "Output: graph/HCLG.fst"
   echo "SRILM must be in your path."
   exit 1
 fi
@@ -74,11 +74,3 @@ utils/format_lm.sh $dict $lm_src.gz $dict_src/lexicon.txt $lang || exit 1
 # Tamil's is 360 MB.
 echo "$0: mkgraph"
 utils/mkgraph.sh --self-loop-scale 1.0 $lang $model $graph || exit 1
- 
-# To use this newly created model, also build a decoding configuration.
-# Put these into the directory $newlangdir/conf.
-echo "$0: prepare_online_decoding"
-steps/online/nnet3/prepare_online_decoding.sh --mfcc-config conf/mfcc_hires.conf $lang exp/nnet3/extractor exp/chain/tdnn_7b $newlangdir || exit 1
-chmod a-x $newlangdir/conf/*.conf
-
-# It doesn't matter that mkgraph and prepare_online_decoding are reversed from https://chrisearch.wordpress.com/2017/03/11/speech-recognition-using-kaldi-extending-and-using-the-aspire-model.
