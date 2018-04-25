@@ -7,6 +7,31 @@ Use a pre-trained acoustic model, an L pronunciation dictionary, and an L langua
 This approach converts phones directly to L words, instead of using multiple cross-trained ASRs to make English words
 from which phone strings are extracted, merged with [PTgen](https://github.com/uiuc-sst/PTgen), and reconstituted into L words (which turned out to be too noisy).
 
+<!-- To refresh this TOC, 
+Just once:
+  `wget https://raw.githubusercontent.com/ekalinin/github-markdown-toc/master/gh-md-toc`
+  `chmod a+x gh-md-toc`
+When README.md updates:
+  `./gh-md-toc --insert README.md`
+-->
+<!--ts-->
+   * [asr24](#asr24)
+   * [Install software.](#install-software)
+         * [Install Kaldi.](#install-kaldi)
+         * [Get this repo's code.](#get-this-repos-code)
+         * [Set up Krisztián Varga's <a href="https://chrisearch.wordpress.com/2017/03/11/speech-recognition-using-kaldi-extending-and-using-the-aspire-model/" rel="nofollow">extension</a> of <a href="http://kaldi-asr.org/models.html" rel="nofollow">ASpIRE</a>.](#set-up-krisztián-vargas-extension-of-aspire)
+   * [For each language L, build an ASR.](#for-each-language-l-build-an-asr)
+         * [Get raw text, G2P, etc.](#get-raw-text-g2p-etc)
+         * [Build the ASR.](#build-the-asr)
+   * [Transcribe speech.](#transcribe-speech)
+         * [Get speech recordings.](#get-speech-recordings)
+         * [On the campus cluster:](#on-the-campus-cluster)
+         * [On ifp-53:](#on-ifp-53)
+
+<!-- Added by: camilleg, at: 2018-04-25T16:05-0500 -->
+
+<!--te-->
+
 # Install software.
 
 ### Install Kaldi.
