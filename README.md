@@ -7,7 +7,7 @@ Use a pre-trained acoustic model, an L pronunciation dictionary, and an L langua
 This approach converts phones directly to L words, instead of using multiple cross-trained ASRs to make English words
 from which phone strings are extracted, merged with [PTgen](https://github.com/uiuc-sst/PTgen), and reconstituted into L words (which turned out to be too noisy).
 
-## How to install
+# Install software.
 
 ### Install Kaldi.
 If you haven't already installed a version of Kaldi newer than 2016 Sep 30, `git clone https://github.com/kaldi-asr/kaldi` and build it, following the instructions in its INSTALL files:
@@ -60,7 +60,27 @@ or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000 8khz.wav`.
       'ark:/dev/null'
 ```
 
-### Get the speech recordings.
+# For each language L, build an ASR.
+
+### Get raw text, G2P, etc.
+
+- Into `$L/train_all/text` put word strings in L (scraped from wherever), roughly 10 words per line, at most 500k lines.  These can be quite noisy, because they'll be cleaned up.
+- Get a G2P `g2aspire-$L.txt`, a few hundred lines each containing grapheme(s), whitespace, and space-delimited Aspire-style phones.
+
+### Build the ASR.
+- `./mkprondict.py $L/train_all/text g2aspire-$L.txt $L/lang/clean.txt $L/local/dict/lexicon.txt $L/local/dict/words.txt /tmp/phones.txt /tmp/letters-culled-by-cleaning.txt` makes files needed by the subsequent steps (but the /tmp files aren't used).  
+  (`/tmp/phones.txt` is a subset of `$L/local/dict/nonsilence_phones.txt`, which is the standard Aspire version.)
+- `./newlangdir_train_lms.sh $L` makes a language model for L.
+- On ifp-53, `./newlangdir_make_graphs.sh $L` makes L.fst, G.fst, and then an L-customized HCLG.fst.
+- On ifp-53, `scp $L/graph/HCLG.fst cog@golubh1.campuscluster.illinois.edu:/projects/beckman/jhasegaw/kaldi/egs/aspire/asr24/$L/graph/HCLG.fst`
+- If decoding on campus cluster, copy some files to it.
+  On ifp-53, `cp -p $L/lang/phones.txt $L/graph/words.txt ~camilleg/l/eval/`.
+  On campus cluster, `cd $L/lang; wget http://www.ifp.illinois.edu/~camilleg/e/phones.txt; cd ../graph; wget http://www.ifp.illinois.edu/~camilleg/e/words.txt`.
+- On ifp-53 *or* campus cluster, `./newlangdir_make_confs.sh $L` makes some config files.
+
+# Transcribe speech.
+
+### Get speech recordings.
 On ifp-serv-03.ifp.illinois.edu, get LDC speech:
 ```
     cd /ws/ifp-serv-03_1/workspace/fletcher/fletcher1/speech_data1/Russian/LDC2016E111/RUS_20160930
@@ -72,31 +92,14 @@ On ifp-serv-03.ifp.illinois.edu, get LDC speech:
     tar cf /workspace/ifp-53_1-data/eval/8k.tar -C /tmp 8k
     rm -rf /tmp/8k
 ```
-Then, on the campus cluster:
+Then, on the campus cluster or ifp-53:
 ```
-    cd /projects/beckman/jhasegaw/kaldi/egs/aspire/asr24
-    wget -qO- http://www.ifp.illinois.edu/~camilleg/e/8k.tar | tar xf -
-    mv 8k $L-8khz
-```
-Similarly, on ifp-53:
-```
-    cd ~/kaldi/egs/aspire/asr24
+    cd kaldi/egs/aspire/asr24
     wget -qO- http://www.ifp.illinois.edu/~camilleg/e/8k.tar | tar xf -
     mv 8k $L-8khz
 ```
 
-### Transcribe the speech.
-- `./mkprondict.py $L/train_all/text g2aspire-$L.txt $L/lang/clean.txt $L/local/dict/lexicon.txt $L/local/dict/words.txt /tmp/phones.txt /tmp/letters-culled-by-cleaning.txt` makes files needed by the subsequent steps (but the /tmp files aren't used).  
-  (`/tmp/phones.txt` is a subset of `$L/local/dict/nonsilence_phones.txt`, which is the standard Aspire version.)
-- `./newlangdir_train_lms.sh $L` makes a language model for L.
-- On ifp-53, `./newlangdir_make_graphs.sh $L` makes L.fst, G.fst, and then an L-customized HCLG.fst.
-- On ifp-53, `scp $L/graph/HCLG.fst cog@golubh1.campuscluster.illinois.edu:/projects/beckman/jhasegaw/kaldi/egs/aspire/asr24/$L/graph/HCLG.fst`
-- If decoding on campus cluster, copy some files to it.
-  On ifp-53, `cp -p $L/lang/phones.txt $L/graph/words.txt ~camilleg/l/eval/`.
-  On campus cluster, `cd $L/lang; wget http://www.ifp.illinois.edu/~camilleg/e/phones.txt; cd ../graph; wget http://www.ifp.illinois.edu/~camilleg/e/words.txt`.
-- On ifp-53 *or* campus cluster, `./newlangdir_make_confs.sh $L` makes some config files.
-
-#### On the campus cluster:
+### On the campus cluster:
 - `./mkscp.py $L-8khz 20 $L` splits the transcription tasks into jobs shorter than the 30-minute maximum of the campus cluster's secondary queue.
 Its reads `$L-8khz`, a dir of 8 kHz speech files, each named something like TAM_EVAL_072_008.wav.
 `20` is the number of jobs, found empirically.
@@ -109,7 +112,7 @@ but 26 of the 150 7-utterance jobs were aborted at 10 cpu-minutes
 (because some utterances are longer; mkscp.py should split jobs by .wav duration instead).
 Even accounting for that, the transcriptions differ slightly from ifp-53's.
 
-#### On ifp-53:
+### On ifp-53:
 - `./mkscp.py $L-8khz $(nproc) $L` splits the tasks into one job per CPU core.
 - `./$L-submit.sh 2> $L.out` launches all these jobs.
 - `grep -e ^TAM_EVAL $L.out | sort` extracts the transcriptions.
