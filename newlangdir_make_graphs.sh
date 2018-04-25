@@ -9,7 +9,7 @@
 if [ $# != 1 ]; then
   echo "Usage: $0 <newlangdir>" # e.g., $0 tamil, or $0 russian.
   echo "Inputs and outputs are all in <newlangdir>."
-  echo "Inputs: lang/clean.txt, local/dict/{lexicon.txt, extra_questions.txt, nonsilence_phones.txt, optional_silence.txt, silence_phones.txt, words.txt}."
+  echo "Inputs: lang/clean.txt, local/dict/lexicon.txt, local/dict/words.txt."
   # Intermediate outputs: lang/topo == dict.topo (from prepare_lang.sh);
   #                       local/dict/lexiconp.txt; dict/L.fst == lang/L.fst; lang/G.fst; lang/lm.arpa.gz.
   echo "Output: graph/HCLG.fst"
@@ -44,17 +44,64 @@ lm_src=$lang/lm.arpa
 [ ! -f $lang/clean.txt ] && echo "$0: missing file $lang/clean.txt. Aborting." && exit 1
 [ ! -d $dict_src ] && echo "$0: missing directory $dict_src. Aborting." && exit 1
 [ ! -f $dict_src/lexicon.txt ] && echo "$0: missing file $dict_src/lexicon.txt. Aborting." && exit 1
-[ ! -f $dict_src/extra_questions.txt ] && echo "$0: missing file $dict_src/extra_questions.txt. Aborting." && exit 1
-[ ! -f $dict_src/nonsilence_phones.txt ] && echo "$0: missing file $dict_src/nonsilence_phones.txt. Aborting." && exit 1
-[ ! -f $dict_src/optional_silence.txt ] && echo "$0: missing file $dict_src/optional_silence.txt. Aborting." && exit 1
-[ ! -f $dict_src/silence_phones.txt ] && echo "$0: missing file $dict_src/silence_phones.txt. Aborting." && exit 1
 [ ! -f $dict_src/words.txt ] && echo "$0: missing file $dict_src/words.txt. Aborting." && exit 1
 [ ! -d $model ] && echo "$0: missing directory $model. Aborting." && exit 1
 [ ! -f $phones_src ] && echo "$0: missing file $phones_src. Aborting." && exit 1
 
+echo "$0: prepare_lang"
+# Make some files.
+echo "sil laughter noise oov" > $dict_src/extra_questions.txt
+echo "sil" > $dict_src/optional_silence.txt
+cat << EOF > $dict_src/silence_phones.txt
+sil
+laughter
+noise
+oov
+EOF
+cat << EOF > $dict_src/nonsilence_phones.txt
+aa
+ae
+ah
+ao
+aw
+ay
+b
+ch
+d
+dh
+eh
+er
+ey
+f
+g
+hh
+ih
+iy
+jh
+k
+l
+m
+n
+ng
+ow
+oy
+p
+r
+s
+sh
+t
+th
+uh
+uw
+v
+w
+y
+z
+zh
+EOF
+
 # Make lexiconp.txt from lexicon.txt.
 # Compile the word lexicon, L.fst.
-echo "$0: prepare_lang"
 if [ $dict_src/lexiconp.txt -ot $dict_src/lexicon.txt ]; then
   # It might not have been created yet.
   rm -f $dict_src/lexiconp.txt
