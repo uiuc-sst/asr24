@@ -60,7 +60,7 @@ with open(cmd_submit, 'w') as j:
         with open(scpfilename, 'w') as f:
             with open(spk2uttfilename, 'w') as g:
                 for m in range(math.ceil(n*num_per_scp), min(len(wavfiles), math.ceil((n+1)*num_per_scp))):
-                    f.write('{}\t{}{}\n'.format(ids[m], data_dir, wavfiles[m]))
+                    f.write('{}\t{}/{}\n'.format(ids[m], data_dir, wavfiles[m]))
                     g.write('{}\t{}\n'.format(ids[m], ids[m]))
 
         with open(cmdfilename, 'w') as h:
