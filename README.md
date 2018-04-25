@@ -78,6 +78,12 @@ Then, on the campus cluster:
     wget -qO- http://www.ifp.illinois.edu/~camilleg/e/8k.tar | tar xf -
     mv 8k $L-8khz
 ```
+Similarly, on ifp-53:
+```
+    cd ~/kaldi/egs/aspire/asr24
+    wget -qO- http://www.ifp.illinois.edu/~camilleg/e/8k.tar | tar xf -
+    mv 8k $L-8khz
+```
 
 ### Transcribe the speech.
 - `./mkprondict.py $L/train_all/text g2aspire-$L.txt $L/lang/clean.txt $L/local/dict/lexicon.txt $L/local/dict/words.txt /tmp/phones.txt /tmp/letters-culled-by-cleaning.txt` makes files needed by the subsequent steps (but the /tmp files aren't used).  
