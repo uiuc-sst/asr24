@@ -9,14 +9,14 @@ from which phone strings are extracted, merged with [PTgen](https://github.com/u
 
 ## How to install
 
-#### Install Kaldi.
+### Install Kaldi.
 If you haven't already installed a version of Kaldi newer than 2016 Sep 30, `git clone https://github.com/kaldi-asr/kaldi` and build it, following the instructions in its INSTALL files:
 ```
     cd kaldi/tools; make -j $(nproc)
     cd ../src; ./configure --shared && make depend -j $(nproc) && make -j $(nproc)
 ```
 
-#### Get this repo's code.
+### Get this repo's code.
 It goes into a directory `asr24`, a sister of the usual `s5` directory.
 ```
     cd kaldi/egs/aspire
@@ -24,7 +24,7 @@ It goes into a directory `asr24`, a sister of the usual `s5` directory.
     cd asr24
 ```
 
-#### Set up Krisztián Varga's [extension](https://chrisearch.wordpress.com/2017/03/11/speech-recognition-using-kaldi-extending-and-using-the-aspire-model/) of [ASpIRE](http://kaldi-asr.org/models.html).
+### Set up Krisztián Varga's [extension](https://chrisearch.wordpress.com/2017/03/11/speech-recognition-using-kaldi-extending-and-using-the-aspire-model/) of [ASpIRE](http://kaldi-asr.org/models.html).
 - Get the [ASpIRE chain model](http://kaldi-asr.org/models.html):
 ```
     cd kaldi/egs/aspire/asr24
@@ -60,7 +60,7 @@ or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000 8khz.wav`.
       'ark:/dev/null'
 ```
 
-#### Get the speech recordings.
+### Get the speech recordings.
 On ifp-serv-03.ifp.illinois.edu, get LDC speech:
 ```
     cd /ws/ifp-serv-03_1/workspace/fletcher/fletcher1/speech_data1/Russian/LDC2016E111/RUS_20160930
@@ -79,7 +79,7 @@ Then, on the campus cluster:
     mv 8k $L-8khz
 ```
 
-#### Transcribe the speech.
+### Transcribe the speech.
 - `./mkprondict.py $L/train_all/text g2aspire-$L.txt $L/lang/clean.txt $L/local/dict/lexicon.txt $L/local/dict/words.txt /tmp/phones.txt /tmp/letters-culled-by-cleaning.txt` makes files needed by the subsequent steps (but the /tmp files aren't used).  
   (`/tmp/phones.txt` is a subset of `$L/local/dict/nonsilence_phones.txt`, which is the standard Aspire version.)
 - `./newlangdir_train_lms.sh $L` makes a language model for L.
@@ -90,13 +90,22 @@ Then, on the campus cluster:
   On campus cluster, `cd $L/lang; wget http://www.ifp.illinois.edu/~camilleg/e/phones.txt; cd ../graph; wget http://www.ifp.illinois.edu/~camilleg/e/words.txt`.
 - On ifp-53 *or* campus cluster, `./newlangdir_make_confs.sh $L` makes some config files.
 
-On the campus cluster:
+#### On the campus cluster:
 - `./mkscp.py $L-8khz 20 $L` splits the transcription tasks into jobs shorter than the 30-minute maximum of the campus cluster's secondary queue.
 Its reads `$L-8khz`, a dir of 8 kHz speech files, each named something like TAM_EVAL_072_008.wav.
 `20` is the number of jobs, found empirically.
 It makes the following shell script. 
 - `./$L-submit.sh` launches all these jobs.
+- `cat tamil*.sh.e* | grep -e ^TAM_EVAL | sort` extracts the transcriptions.
 
-On ifp-53:
+TAM_EVAL_20170601 was [transcribed](./tamil-scrips-ccluster.txt) in 45 minutes,
+but 26 of the 150 7-utterance jobs were aborted at 10 cpu-minutes
+(because some utterances are longer; mkscp.py should split jobs by .wav duration instead).
+Even accounting for that, the transcriptions differ slightly from ifp-53's.
+
+#### On ifp-53:
 - `./mkscp.py $L-8khz $(nproc) $L` splits the tasks into one job per CPU core.
 - `./$L-submit.sh 2> $L.out` launches all these jobs.
+- `grep -e ^TAM_EVAL $L.out | sort` extracts the transcriptions.
+
+TAM_EVAL_20170601 was [transcribed](./tamil-scrips-ifp53.txt) in 45 minutes.
