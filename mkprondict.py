@@ -22,6 +22,15 @@ if len(sys.argv) != 8:
     exit(0)
 dummy, fileIntxt, fileIndict, fileOuttxt, fileOutdict, fileWords, filePhones, fileMissingchars = sys.argv
 
+# Make dirs of output files.
+for filename in [fileOuttxt, fileOutdict, fileMissingchars, fileWords, filePhones]:
+    if not os.path.exists(os.path.dirname(filename)):
+        try:
+            os.makedirs(os.path.dirname(filename))
+        except OSError as exc: # Avoid race condition when dir was made between path.exists and makedirs.
+            if exc.errno != errno.EEXIST:
+                raise
+
 # Read fileIndict.
 g2p = []
 phoneset = {}
