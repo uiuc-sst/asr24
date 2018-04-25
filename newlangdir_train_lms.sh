@@ -6,7 +6,6 @@
 #
 # Works on Mac, campus cluster, ifp-53.
 # Takes about a minute, on 100k words.  Not multicore.
-# (Originally in s5/local, run from s5.)
 
 if [ $# != 1 ]; then
   echo "Usage: $0 <newlangdir>" # e.g., $0 tamil, or $0 russian.
@@ -84,3 +83,5 @@ train_lm.sh --arpa --lmtype 3gram-mincount $dir || exit 1
 # Perplexity over 88307.000000 words (excluding 691.000000 OOVs) is 71.241332
 # Camille, Tamil:
 # Perplexity over 96350.000000 words (excluding 14607.000000 OOVs) is 2171.406327
+# Camille, Russian:
+# Perplexity over 88754.000000 words (excluding 0.000000 OOVs) is 2055.848689

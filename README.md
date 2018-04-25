@@ -95,7 +95,7 @@ or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000 8khz.wav`.
 ### Build the ASR.
 - `./mkprondict.py $L/train_all/text g2aspire-$L.txt $L/lang/clean.txt $L/local/dict/lexicon.txt $L/local/dict/words.txt /tmp/phones.txt /tmp/letters-culled-by-cleaning.txt` makes files needed by the subsequent steps (but the /tmp files aren't used).  
   (`/tmp/phones.txt` is a subset of `$L/local/dict/nonsilence_phones.txt`, which is the standard Aspire version.)
-- `./newlangdir_train_lms.sh $L` makes a language model for L.
+- `./newlangdir_train_lms.sh $L` makes a language model for L, `$L/local/lm/3gram-mincount/lm_unpruned.gz`.
 - On ifp-53, `./newlangdir_make_graphs.sh $L` makes L.fst, G.fst, and then an L-customized HCLG.fst.
 - On ifp-53, `scp $L/graph/HCLG.fst cog@golubh1.campuscluster.illinois.edu:/projects/beckman/jhasegaw/kaldi/egs/aspire/asr24/$L/graph/HCLG.fst`
 - If decoding on campus cluster, copy some files to it.
