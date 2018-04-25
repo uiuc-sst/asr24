@@ -98,15 +98,14 @@ or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000 8khz.wav`.
 - `./newlangdir_train_lms.sh $L` makes a language model for L, `$L/local/lm/3gram-mincount/lm_unpruned.gz`.
 - On ifp-53, `./newlangdir_make_graphs.sh $L` makes L.fst, G.fst, and then an L-customized HCLG.fst.
 - On ifp-53, `scp $L/graph/HCLG.fst cog@golubh1.campuscluster.illinois.edu:/projects/beckman/jhasegaw/kaldi/egs/aspire/asr24/$L/graph/HCLG.fst`
-- If decoding on campus cluster, copy some files to it.
+- If the host that will do transcribing is the campus cluster, copy some files to it.
   On ifp-53, `cp -p $L/lang/phones.txt $L/graph/words.txt ~camilleg/l/eval/`.
   On campus cluster, `cd $L/lang; wget http://www.ifp.illinois.edu/~camilleg/e/phones.txt; cd ../graph; wget http://www.ifp.illinois.edu/~camilleg/e/words.txt`.
-- On ifp-53 *or* campus cluster, `./newlangdir_make_confs.sh $L` makes some config files.
+- On each host that will do transcribing, `./newlangdir_make_confs.sh $L` makes some config files.
 
 # Transcribe speech.
-
 ### Get speech recordings.
-On ifp-serv-03.ifp.illinois.edu, get LDC speech:
+On ifp-serv-03.ifp.illinois.edu, get LDC speech and convert it to a flat dir of 8 kHz .wav files:
 ```
     cd /ws/ifp-serv-03_1/workspace/fletcher/fletcher1/speech_data1/Russian/LDC2016E111/RUS_20160930
     cd /ws/ifp-serv-03_1/workspace/fletcher/fletcher1/speech_data1/Tamil/TAM_EVAL_20170601/TAM_EVAL_20170601
@@ -117,20 +116,20 @@ On ifp-serv-03.ifp.illinois.edu, get LDC speech:
     tar cf /workspace/ifp-53_1-data/eval/8k.tar -C /tmp 8k
     rm -rf /tmp/8k
 ```
-Then, on the campus cluster or ifp-53:
+Choose a host to run the transcribing, e.g. campus cluster or ifp-53.  On that host:
 ```
     cd kaldi/egs/aspire/asr24
     wget -qO- http://www.ifp.illinois.edu/~camilleg/e/8k.tar | tar xf -
     mv 8k $L-8khz
 ```
 
-### On the campus cluster:
-- `./mkscp.py $L-8khz 20 $L` splits the transcription tasks into jobs shorter than the 30-minute maximum of the campus cluster's secondary queue.
-Its reads `$L-8khz`, a dir of 8 kHz speech files, each named something like TAM_EVAL_072_008.wav.
+### On campus cluster:
+- `./mkscp.py $L-8khz 20 $L` splits the transcription tasks into jobs shorter than the 10-minute maximum of the campus cluster's secondary queue.
+Its reads `$L-8khz`, a dir of 8 kHz speech files.
 `20` is the number of jobs, found empirically.
-It makes the following shell script. 
-- `./$L-submit.sh` launches all these jobs.
-- `cat tamil*.sh.e* | grep -e ^TAM_EVAL | sort` extracts the transcriptions.
+It makes $L-submit.sh.
+- `./$L-submit.sh` launches these jobs in parallel.
+- `cat $L*.sh.e* | grep -e ^TAM_EVAL | sort` extracts the transcriptions.
 
 TAM_EVAL_20170601 was [transcribed](./tamil-scrips-ccluster.txt) in 45 minutes,
 but 26 of the 150 7-utterance jobs were aborted at 10 cpu-minutes
@@ -139,7 +138,7 @@ Even accounting for that, the transcriptions differ slightly from ifp-53's.
 
 ### On ifp-53:
 - `./mkscp.py $L-8khz $(nproc) $L` splits the tasks into one job per CPU core.
-- `./$L-submit.sh 2> $L.out` launches all these jobs.
+- `./$L-submit.sh 2> $L.out` launches these jobs in parallel.
 - `grep -e ^TAM_EVAL $L.out | sort` extracts the transcriptions.
 
 TAM_EVAL_20170601 was [transcribed](./tamil-scrips-ifp53.txt) in 45 minutes.
