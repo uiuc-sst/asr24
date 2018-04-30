@@ -19,7 +19,7 @@ USAGE='''USAGE: mkprondict.py in.txt in.g2aspire.dict out.txt out.dict words.txt
 
 if len(sys.argv) != 8:
     print(USAGE)
-    exit(0)
+    exit(1)
 dummy, fileIntxt, fileIndict, fileOuttxt, fileOutdict, fileWords, filePhones, fileMissingchars = sys.argv
 
 # Make dirs of output files.
@@ -39,6 +39,21 @@ with open(fileIndict, 'r', encoding='utf-8') as f:
             g2p[n][words[0].upper()] = ' '.join(words[1:])
             for p in words[1:]:
                 phoneset[p] = 1
+
+# Check that the g2p's phones are all Aspire phones.
+phonesetAspire = {}
+# These are $dict_src/silence_phones.txt.
+phonesetAspire['sil'] = 1
+phonesetAspire['laughter'] = 1
+phonesetAspire['noise'] = 1
+phonesetAspire['oov'] = 1
+with open('nonsilence_phones.txt', 'r', encoding='utf-8') as f:
+    for line in f:
+        phonesetAspire[line.strip()] = 1
+phonesBogus = set(phoneset.keys()) - set(phonesetAspire.keys())
+if phonesBogus:
+    print('Invalid phones in ' + fileIndict + ': ' + str(phonesBogus))
+    exit(1)
 
 # Read fileIntxt, convert words, and write fileOuttxt.
 prondict = {}

@@ -47,6 +47,7 @@ lm_src=$lang/lm.arpa
 [ ! -f $dict_src/words.txt ] && echo "$0: missing file $dict_src/words.txt. Aborting." && exit 1
 [ ! -d $model ] && echo "$0: missing directory $model. Aborting." && exit 1
 [ ! -f $phones_src ] && echo "$0: missing file $phones_src. Aborting." && exit 1
+[ ! -f nonsilence_phones.txt ] && echo "$0: missing file nonsilence_phones.txt. Aborting." && exit 1
 
 echo "$0: prepare_lang"
 # Make some files.
@@ -58,47 +59,7 @@ laughter
 noise
 oov
 EOF
-cat << EOF > $dict_src/nonsilence_phones.txt
-aa
-ae
-ah
-ao
-aw
-ay
-b
-ch
-d
-dh
-eh
-er
-ey
-f
-g
-hh
-ih
-iy
-jh
-k
-l
-m
-n
-ng
-ow
-oy
-p
-r
-s
-sh
-t
-th
-uh
-uw
-v
-w
-y
-z
-zh
-EOF
+cp nonsilence_phones.txt $dict_src
 
 # Make lexiconp.txt from lexicon.txt.
 # Compile the word lexicon, L.fst.
