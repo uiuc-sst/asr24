@@ -118,6 +118,20 @@ On ifp-serv-03.ifp.illinois.edu, get LDC speech and convert it to a flat dir of 
     tar cf /workspace/ifp-53_1-data/eval/8k.tar -C /tmp 8k
     rm -rf /tmp/8k
 ```
+For BABEL .sph files:
+```
+    cd /ws/ifp-serv-03_1/workspace/fletcher/fletcher1/speech_data1/Assamese/LDC2016E02/conversational/training/audio
+    tar cf /tmp/foo.tar BABEL*.sph
+    scp /tmp/foo.tar ifp-53:/tmp
+```
+Then on ifp-53,
+```
+    mkdir ~/kaldi/egs/aspire/asr24/$L-8khz
+    cd myTmpSphDir
+    tar xf /tmp/foo.tar
+    for f in *.sph; do ~/kaldi/tools/sph2pipe_v2.5/sph2pipe -p -f rif "$f" /tmp/a.wav; \
+        sox /tmp/a.wav -r 8000 -c 1 ~/kaldi/egs/aspire/asr24/$L-8khz/$(basename ${f%.*}.wav); done
+```
 Choose a host to run the transcribing, e.g. campus cluster or ifp-53.  On that host:
 ```
     cd kaldi/egs/aspire/asr24
@@ -141,6 +155,6 @@ Even accounting for that, the transcriptions differ slightly from ifp-53's.
 ### On ifp-53:
 - `./mkscp.py $L-8khz $(nproc) $L` splits the tasks into one job per CPU core.
 - `./$L-submit.sh 2> $L.out` launches these jobs in parallel.
-- `grep -e ^TAM_EVAL $L.out | sort`, ...`^RUS_`, etc., extracts the transcriptions.
+- `grep -e ^TAM_EVAL $L.out | sort`, ...`^RUS_`, `^BABEL_`, etc., extracts the transcriptions.
 
 TAM_EVAL_20170601 was [transcribed](./tamil-scrips-ifp53.txt) in 45 minutes.
