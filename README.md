@@ -145,7 +145,7 @@ Its reads `$L-8khz`, a dir of 8 kHz speech files.
 `20` is the number of jobs, found empirically.
 It makes $L-submit.sh.
 - `./$L-submit.sh` launches these jobs in parallel.
-- `cat $L*.sh.e* | grep -e ^TAM_EVAL | sort`, ...`^RUS_`, etc., extracts the transcriptions.
+- `cat $L*.sh.e* | grep -e ^TAM_EVAL | sort`, ...`^RUS_`, `^BABEL_`, etc., extracts the transcriptions.
 
 TAM_EVAL_20170601 was [transcribed](./tamil-scrips-ccluster.txt) in 45 minutes,
 but 26 of the 150 7-utterance jobs were aborted at 10 cpu-minutes
@@ -155,6 +155,8 @@ Even accounting for that, the transcriptions differ slightly from ifp-53's.
 ### On ifp-53:
 - `./mkscp.py $L-8khz $(nproc) $L` splits the tasks into one job per CPU core.
 - `./$L-submit.sh 2> $L.out` launches these jobs in parallel.
-- `grep -e ^TAM_EVAL $L.out | sort`, ...`^RUS_`, `^BABEL_`, etc., extracts the transcriptions.
+- `cat $L.out | grep -e ^TAM_EVAL | sort` extracts the transcriptions.  (This isn't [Useless Use Of Cat](http://porkmail.org/era/unix/award.html) because it stops grep from thinking that `$L.out` is binary rather than text and suppressing the actual output.)
 
-TAM_EVAL_20170601 was [transcribed](./tamil-scrips-ifp53.txt) in 45 minutes.
+TAM_EVAL_20170601 was [transcribed](./tamil-scrips-ifp53.txt) in 45 minutes, or 21 MB/min.  
+RUS_20160930 was transcribed in 67 minutes, or 13 MB/min.  
+A 3.1 GB subset of Assam LDC2016E02 is being transcribed.  
