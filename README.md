@@ -159,4 +159,4 @@ Even accounting for that, the transcriptions differ slightly from ifp-53's.
 
 TAM_EVAL_20170601 was [transcribed](./tamil-scrips-ifp53.txt) in 45 minutes, or 21 MB/min.  
 RUS_20160930 was transcribed in 67 minutes, or 13 MB/min.  
-A 3.1 GB subset of Assam LDC2016E02 is being transcribed.  
+A 3.1 GB subset of Assam LDC2016E02 was transcribed in 440 minutes, or 7 MB/min.  (This may have been slower because it exhausted ifp-53's memory.)  
