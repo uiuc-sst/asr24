@@ -10,8 +10,13 @@
     # Read every second line, chomp off the newline, join into one line, strip noise, compactify whitespace.
     scrip = File.readlines(f) .drop(1).each_slice(2).map(&:first) .map(&:chomp) .join(' ') \
       .gsub('<no-speech>', ' ') \
+      .gsub('<int>', '<INT>') \
+      .gsub('<hes>', '<HES>') \
+      .gsub('<sta>', '<STA>') \
+      .gsub('<laugh>', '<LAUGH>') \
       .gsub('(())', ' ') \
       .gsub(/ [ ]*/, ' ')
+
     puts File.basename(f, ".txt") + ' ' + scrip
   }
 }
