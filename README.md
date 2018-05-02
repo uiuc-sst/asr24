@@ -92,7 +92,9 @@ or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000 8khz.wav`.
 - Into `$L/train_all/text` put word strings in L (scraped from wherever), roughly 10 words per line, at most 500k lines.  These can be quite noisy, because they'll be cleaned up.
 - Get a G2P `g2aspire-$L.txt`, a few hundred lines each containing grapheme(s), whitespace, and space-delimited Aspire-style phones.  
 If that file has CR line terminators, convert them to standard ones in vim with the command `%s/^M/\r/g`, typing `^V` before the `^M`.  
-If that file begins with a BOM, remove it: `vi -b g2aspire-$L.txt`, and just `x` that character away.
+If that file begins with a BOM, remove it: `vi -b g2aspire-$L.txt`, and just `x` that character away.  
+
+- If you need to build the G2P, `./g2ipa2aspire.py $L_ref_orthography_dict.txt aspire2ipa.txt phoibletable.csv > g2aspire-$L.txt`.
 
 ### Build the ASR.
 - `./mkprondict.py $L/train_all/text g2aspire-$L.txt $L/lang/clean.txt $L/local/dict/lexicon.txt $L/local/dict/words.txt /tmp/phones.txt /tmp/letters-culled-by-cleaning.txt` makes files needed by the subsequent steps (but the /tmp files aren't used).  
