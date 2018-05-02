@@ -9,11 +9,11 @@
 ِ	iy
 ٍ	iy n
 ٍ	iy n
-ﷲ	p aa l aa h
 ﷲ	p aa l aa hh
-ﷲ	p aa l aː h
-ﷲ	p aa lː aː h
-ﷲ	p a lː aː h
+ﷲ	p aa l aa hh
+ﷲ	p aa l aw hh
+ﷲ	p aa l aw hh
+ﷲ	p aa l aw hh
 ُ	uw
 ٌ	uw n
 ٌ	uw n
@@ -26,7 +26,7 @@
 َا	aa
 اُ	aw
 اِ	ay
-إ	p i
+إ	p ih
 إ	p iy
 بّ	b
 ب	b
@@ -82,8 +82,8 @@
 گ	g
 لّ	l
 ل	l
-ﻻ	l aː
-ﻼ	l aː
+ﻻ	l aw
+ﻼ	l aw
 ﻻ	l aa
 ﻼ	l aa
 مّ	m
@@ -99,28 +99,28 @@
 ُو	uw
 وّ	w
 و	w
-وَ	w a
+وَ	w aa
 وَ	w aa
 وً	w aa n
 وً	w aa n
-وً	w a n
-وِ	w i
-وٍ	w i n
+وً	w aa n
+وِ	w ih
+وٍ	w ih n
 وِ	w iy
 وٍ	w iy n
 وٍ	w iy n
-وُ	w u
-وٌ	w u n
+وُ	w uh
+وٌ	w uh n
 وُ	w uw
 وٌ	w uw n
 وٌ	w uw n
-وا	w aː
+وا	w aw
 وا	w aa
-وا	y aː
+وا	y aw
 وا	y aa
-وى	w aː
+وى	w aw
 وى	w aa
-وى	y aː
+وى	y aw
 وى	y aa
 ى	aa
 َى	aa
@@ -129,18 +129,18 @@
 ي	iy
 ِي	iy
 يّ	y
-يَ	y a
+يَ	y aa
 يَ	y aa
 يً	y aa n
 يً	y aa n
-يً	y a n
-يِ	y i
-يٍ	y i n
+يً	y aa n
+يِ	y ih
+يٍ	y ih n
 يِ	y iy
 يٍ	y iy n
 يٍ	y iy n
-يُ	y u
-يٌ	y u n
+يُ	y uh
+يٌ	y uh n
 يُ	y uw
 يٌ	y uw n
 يٌ	y uw n
