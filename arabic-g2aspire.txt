@@ -1,0 +1,147 @@
+-	
+ـ	
+ْ	
+َ	aa
+ٰ	aa
+ی	aa
+ً	aa n
+ً	aa n
+ِ	iy
+ٍ	iy n
+ٍ	iy n
+ﷲ	p aa l aa h
+ﷲ	p aa l aa hh
+ﷲ	p aa l aː h
+ﷲ	p aa lː aː h
+ﷲ	p a lː aː h
+ُ	uw
+ٌ	uw n
+ٌ	uw n
+ڤّ	v
+ڤ	v
+ء	p
+آ	aa
+أ	aa
+ا	aa
+َا	aa
+اُ	aw
+اِ	ay
+إ	p i
+إ	p iy
+بّ	b
+ب	b
+پّ	p
+پ	p
+ة	aa
+ةْ	t
+تّ	t
+ت	t
+ثّ	th
+ث	th
+جّ	zh
+ج	zh
+چّ	ch
+چ	ch
+حّ	k
+ح	k
+خّ	k
+خ	k
+دّ	d
+د	d
+ذّ	dh
+ذ	dh
+رّ	l
+ر	l
+زّ	z
+ز	z
+ژّ	jh
+ژ	jh
+سّ	s
+س	s
+شّ	sh
+ش	sh
+صّ	s
+ص	s
+ضّ	d
+ض	d
+طّ	t
+ط	t
+ظّ	dh
+ظ	dh
+عّ	g
+ع	g
+غّ	g
+غ	g
+فّ	f
+ف	f
+قّ	k
+ق	k
+كّ	k
+ك	k
+گّ	g
+گ	g
+لّ	l
+ل	l
+ﻻ	l aː
+ﻼ	l aː
+ﻻ	l aa
+ﻼ	l aa
+مّ	m
+م	m
+نّ	n
+ن	n
+هّ	hh
+ه	hh
+َو	aw
+ؤ	p
+وْ	uw
+و	uw
+ُو	uw
+وّ	w
+و	w
+وَ	w a
+وَ	w aa
+وً	w aa n
+وً	w aa n
+وً	w a n
+وِ	w i
+وٍ	w i n
+وِ	w iy
+وٍ	w iy n
+وٍ	w iy n
+وُ	w u
+وٌ	w u n
+وُ	w uw
+وٌ	w uw n
+وٌ	w uw n
+وا	w aː
+وا	w aa
+وا	y aː
+وا	y aa
+وى	w aː
+وى	w aa
+وى	y aː
+وى	y aa
+ى	aa
+َى	aa
+َي	ay
+يْ	iy
+ي	iy
+ِي	iy
+يّ	y
+يَ	y a
+يَ	y aa
+يً	y aa n
+يً	y aa n
+يً	y a n
+يِ	y i
+يٍ	y i n
+يِ	y iy
+يٍ	y iy n
+يٍ	y iy n
+يُ	y u
+يٌ	y u n
+يُ	y uw
+يٌ	y uw n
+يٌ	y uw n
+ئ	p

@@ -1,37 +1,30 @@
 #!/usr/bin/env python3
 
-import sys
-import io
-import os.path
-import csv
+import sys, io, csv
 from collections import deque
-from urllib import request
 
-USAGE='''g2ipa2aspire.py g2ipa.txt aspire2ipa.txt phoiblefilename.csv
-   Outputs g2aspire.txt, by compose(g2ipa, inverse(aspire2ipa.txt)).
-   g2ipa.txt, aspire2ipa.txt, and g2aspire.txt are all text-format dictionaries.
-   aspire2ipa must be one-to-one; any word after the second, on each line, is ignored.
-   If g2ipa.txt includes IPA symbols that are not in aspire2ipa.txt, instead use
-   the closest-matching symbols, determined by measuring feature vectors in phoiblefilename.csv,
-   and finding minimum L0 feature vector distance.
+USAGE='''g2ipa2aspire.py g2ipa.txt aspire2ipa.txt phoibletable.csv > lang-g2aspire.txt
+   Composes g2ipa with the inverse of aspire2ipa.txt.
+   The inputs g2ipa.txt, aspire2ipa.txt, and g2aspire.txt are all text-format dictionaries.
+   aspire2ipa.txt must be one-to-one: any word after the second, on each line, is ignored.
+   g2ipa.txt is typically something like Arabic_ref_orthography_dict.txt;
+   if that includes IPA symbols that are not in aspire2ipa.txt, instead use
+   the closest-matching symbols, determined by measuring feature vectors in phoibletable.csv
+   and finding the minimum L0 feature vector distance.
+   The output may include zero-length pronunciations, which may upset mkprondict.py.
 '''
 
-# For each grapheme in https://github.com/uiuc-sst/g2ps/blob/master/Arabic/Arabic_ref_orthography_dict.txt,
+# For each grapheme in g2ipa.txt,
 # for each of its corresponding phonemes,
-#   (1) if the phoneme isn't in aspire2ipa.txt, use phoibletable.csv to find the aspire phoneme with the nearest list of distinctive features;
+#   (1) if it's not in aspire2ipa.txt, use phoibletable.csv to find the aspire phoneme with the nearest list of distinctive features;
 #   (2) replace the IPA symbol with the aspire symbol.
-# Write the result to arabic2aspire.txt.
-# The phoible table adds several entries to the one on the phoible GitHub.
-# Some graphemes in arabic2aspire.txt have zero-length pronunciations.  That may upset mkprondict.py.
 
 if len(sys.argv) < 4:
     print(USAGE)
     exit(0)
-g2ipa_filename = sys.argv[1]
-aspire2ipa_filename = sys.argv[2]
-phoiblefilename = sys.argv[3]
+dummy, g2ipa_filename, aspire2ipa_filename, phoiblefilename = sys.argv
 
-# ipa2aspire maps str -> str, because it must be one-to-one.
+# Map str -> str, because it must be one-to-one.
 ipa2aspire = {}
 with open(aspire2ipa_filename) as f:
     for line in f:
@@ -39,7 +32,7 @@ with open(aspire2ipa_filename) as f:
         if len(p) > 1:
             ipa2aspire[p[1]] = p[0]
 
-# g2ipa maps str -> array(str), because it may be one-to-many.
+# Map str -> array(str), because it may be one-to-many.
 g2ipa = {}
 not_in_aspire = {}
 with open(g2ipa_filename) as f:
