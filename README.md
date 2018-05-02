@@ -94,10 +94,10 @@ or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000 8khz.wav`.
 If that file has CR line terminators, convert them to standard ones in vim with the command `%s/^M/\r/g`, typing `^V` before the `^M`.  
 If that file begins with a BOM, remove it: `vi -b g2aspire-$L.txt`, and just `x` that character away.  
 
-- If you need to build the G2P, `./g2ipa2aspire.py $L_ref_orthography_dict.txt aspire2ipa.txt phoibletable.csv > g2aspire-$L.txt`.
+- If you need to build the G2P, `./g2ipa2asr.py $L_ref_orthography_dict.txt aspire2ipa.txt phoibletable.csv > g2aspire-$L.txt`.
 
 ### Build the ASR.
-- `./mkprondict.py $L/train_all/text g2aspire-$L.txt $L/lang/clean.txt $L/local/dict/lexicon.txt $L/local/dict/words.txt /tmp/phones.txt /tmp/letters-culled-by-cleaning.txt` makes files needed by the subsequent steps (but the /tmp files aren't used).  
+- `./mkprondict.py $L/train_all/text $L-g2aspire.txt $L/lang/clean.txt $L/local/dict/lexicon.txt $L/local/dict/words.txt /tmp/phones.txt /tmp/letters-culled-by-cleaning.txt` makes files needed by the subsequent steps (but the /tmp files aren't used).  
   (`/tmp/phones.txt` is a subset of `$L/local/dict/nonsilence_phones.txt`, which is the standard Aspire version.)
 - `./newlangdir_train_lms.sh $L` makes a language model for L, `$L/local/lm/3gram-mincount/lm_unpruned.gz`.
 - On ifp-53, `./newlangdir_make_graphs.sh $L` makes L.fst, G.fst, and then an L-customized HCLG.fst.
@@ -162,3 +162,4 @@ Even accounting for that, the transcriptions differ slightly from ifp-53's.
 TAM_EVAL_20170601 was [transcribed](./tamil-scrips-ifp53.txt) in 45 minutes, or 21 MB/min.  
 RUS_20160930 was transcribed in 67 minutes, or 13 MB/min.  
 A 3.1 GB subset of Assam LDC2016E02 was transcribed in 440 minutes, or 7 MB/min.  (This may have been slower because it exhausted ifp-53's memory.)  
+Arabic/NEMLAR_speech/NMBCN7AR, 2.2 GB (40 hours of speech), was [transcribed](./arabic-scrips.txt) in 147 minutes, or 14 MB/min, or 16x faster than real time.  (This may have been faster because it was a few long (half-hour) files instead of many brief ones.)
