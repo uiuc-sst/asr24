@@ -16,10 +16,16 @@ end
 open(ARGV[0], "r:ISO-8859-1:UTF-8") {|io|
   io.each {|x|
     unless x.match(/^\\/) then 
+      # Strip NEMLAR noise that can't appear in a speech transcription.
+      x.gsub! '&lt;', ' '
+      x.gsub! '&gt;', ' '
+      x.gsub! /[«»\,\:\;\.]/, ' '
       # Convert raw Arabic text.
       x.tr! '<>\'&}|{AYbtvjHxdgrzs$SpDTZcJfqklmnhwy', 'أإءؤئآٱاىبتثجحخدذرزسشصةضطظعغفقكلمنهوي'
       # Strip diacriticized text, which is rare in newspapers.
       x.gsub! /[aiuoFKN~]/, ''
+      # Combine consecutive spaces.
+      x.gsub!(/ [ ]*/, ' ')
     end
     puts x
   }
