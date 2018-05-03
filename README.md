@@ -159,7 +159,7 @@ Even accounting for that, the transcriptions differ slightly from ifp-53's.
 - `./$L-submit.sh 2> $L.out` launches these jobs in parallel.
 - `cat $L.out | grep -e ^TAM_EVAL | sort` extracts the transcriptions.  (This isn't [Useless Use Of Cat](http://porkmail.org/era/unix/award.html) because it stops grep from thinking that `$L.out` is binary rather than text and suppressing the actual output.)
 
-TAM_EVAL_20170601 was [transcribed](./tamil-scrips-ifp53.txt) in 45 minutes, or 21 MB/min.  
-RUS_20160930 was transcribed in 67 minutes, or 13 MB/min.  
-A 3.1 GB subset of Assam LDC2016E02 was transcribed in 440 minutes, or 7 MB/min.  (This may have been slower because it exhausted ifp-53's memory.)  
-Arabic/NEMLAR_speech/NMBCN7AR, 2.2 GB (40 hours of speech), was [transcribed](./arabic-scrips.txt) in 147 minutes, or 14 MB/min, or 16x faster than real time.  (This may have been faster because it was a few long (half-hour) files instead of many brief ones.)
+TAM_EVAL_20170601 was [transcribed](./tamil-scrips-ifp53.txt) in 45 minutes, 21 MB/min, **19x** faster than real time.  
+RUS_20160930 was transcribed in 67 minutes, 13 MB/min, **12x** real time.  
+A 3.1 GB subset of Assam LDC2016E02 was transcribed in 440 minutes, 7 MB/min, **6.5x** real time.  (This may have been slower because it exhausted ifp-53's memory.)  
+Arabic/NEMLAR_speech/NMBCN7AR, 2.2 GB (40 hours), was [transcribed](./arabic-scrips.txt) in 147 minutes, 14 MB/min, **16x** real time.  (This may have been faster because it was a few long (half-hour) files instead of many brief ones.)
