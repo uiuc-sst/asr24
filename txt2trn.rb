@@ -6,7 +6,8 @@
 # Usage:
 # ./txt2trn.rb < arabic-ref.txt > arabic-ref.trn.txt
 # ./txt2trn.rb < arabic-scrips.txt > arabic-scrips.trn.txt
-
+# kaldi/tools/sctk/bin/sclite -i wsj -f 2 -r arabic-ref.trn.txt trn -h arabic-scrips.trn.txt trn > alignments.txt
+#
 # Each input line is an utterance: id, whitespace, words.
 # Each output line is words, whitespace, (id).
 
