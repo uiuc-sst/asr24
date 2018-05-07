@@ -8,7 +8,7 @@ USAGE='''g2ipa2asr.py g2ipa.txt asr2ipa.txt phoibletable.csv > g2asr.txt
    The inputs g2ipa.txt, asr2ipa.txt, and g2asr.txt are all text-format dictionaries.
    asr2ipa.txt: each line is an ASR phone, whitespace, and the corresponding IPA phone.
    g2ipa.txt: each line is a grapheme followed by IPA symbols, whitespace-delimited;
-       typically something like Arabic_ref_orthography_dict.txt;
+       typically something like https://github.com/uiuc-sst/g2ps/blob/master/Arabic/Arabic_wikipedia_symboltable.txt;
        if it includes IPA symbols that are not in asr2ipa.txt, we instead use
        the closest-matching symbols, determined by measuring feature vectors in phoibletable.csv
        and finding the minimum L0 feature vector distance.
