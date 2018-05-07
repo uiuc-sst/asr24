@@ -28,6 +28,7 @@ with open(asr2ipa_filename) as f:
         p = line.rstrip().split()
         if len(p) > 1:
             ipa2asr[p[1]] = p[0]
+ipa2asr['<unk>'] = 'sil'
 
 # Map str -> array(str), because it may be one-to-many.
 g2ipa = {}
@@ -56,10 +57,18 @@ if len(not_in_asr) > 0:
 
 # Find the asr phoneme with minimum distance.
 def nearest_in_table(phone, table, ipa2feats):
+    bestoutput = '<unk>'
+    if phone not in ipa2feats:
+        sys.stderr.write('g2ipa2asr.py: ' + phoiblefilename + ' lacks phone ' + phone + '\n')
+        return bestoutput
     phfeats = ipa2feats[phone]
     mincost = len(phfeats)+1
-    bestoutput = '<unk>'
     for testph in table.keys():
+        if testph == '<unk>':
+            continue
+        if testph not in ipa2feats:
+            sys.stderr.write('g2ipa2asr.py: ' + phoiblefilename + ' lacks test-phone ' + testph + '\n')
+            continue
         testfeats = ipa2feats[testph]
         # Count how many features differ between testfeats and phfeats.
         cost = len([n for n in range(0, len(phfeats)) if testfeats[n] != phfeats[n]])
@@ -67,7 +76,7 @@ def nearest_in_table(phone, table, ipa2feats):
         if cost < mincost:
             mincost = cost
             bestoutput = testph
-    return(bestoutput)
+    return bestoutput
 
 # Compose each entry in g2ipa with ipa2feats and ipa2asr.
 for (g, prons) in g2ipa.items():
