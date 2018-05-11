@@ -158,6 +158,7 @@ Even accounting for that, the transcriptions differ slightly from ifp-53's.
 - `./mkscp.py $L-8khz $(nproc) $L` splits the tasks into one job per CPU core.
 - `./$L-submit.sh 2> $L.out` launches these jobs in parallel.
 - `cat $L.out | grep -e ^TAM_EVAL | sort` extracts the transcriptions.  (This isn't [Useless Use Of Cat](http://porkmail.org/era/unix/award.html) because it stops grep from thinking that `$L.out` is binary rather than text and suppressing the actual output.)
+- `cat $L/lat/*.ascii | sort` extracts the n best transcriptions of each .wav file.
 
 TAM_EVAL_20170601 was [transcribed](./tamil-scrips-ifp53.txt) in 45 minutes, 21 MB/min, **19x** faster than real time.  
 RUS_20160930 was transcribed in 67 minutes, 13 MB/min, **12x** real time.  
