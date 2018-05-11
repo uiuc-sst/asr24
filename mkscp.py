@@ -37,9 +37,12 @@ if not os.path.exists(spk2utt_base):
 cmd_base = lang + '/cmd/'
 if not os.path.exists(cmd_base):
     os.mkdir(cmd_base)
+lat_base = lang + '/lat/'
+if not os.path.exists(lat_base):
+    os.mkdir(lat_base)
 
 # Remove previously made files.
-for f in glob.glob(scp_base + '*') + glob.glob(spk2utt_base + '*') + glob.glob(cmd_base + '*'):
+for f in glob.glob(scp_base + '*') + glob.glob(spk2utt_base + '*') + glob.glob(cmd_base + '*') + glob.glob(lat_base + '*'):
     os.remove(f)
 
 # Write slightly different files, depending on if this host has qsub or not.
@@ -54,23 +57,29 @@ cmd_submit = lang + '-submit.sh'
 with open(cmd_submit, 'w') as j:
     j.write('#!/usr/bin/env bash\n')
     for n in range(0, num_jobs):
-        scpfilename = '%s%s%2.2d.txt' % (scp_base, lang, n)
-        spk2uttfilename = '%s%s%2.2d.txt' % (spk2utt_base, lang, n)
-        cmdfilename = '%s%s%2.2d.sh' % (cmd_base, lang, n)
+        scpfilename = '%s%2.2d.txt' % (scp_base, n)
+        spk2uttfilename = '%s%2.2d.txt' % (spk2utt_base, n)
         with open(scpfilename, 'w') as f:
             with open(spk2uttfilename, 'w') as g:
                 for m in range(math.ceil(n*num_per_scp), min(len(wavfiles), math.ceil((n+1)*num_per_scp))):
-                    f.write('{}\t{}/{}\n'.format(ids[m], data_dir, wavfiles[m]))
+                    f.write('{}\t{}{}\n'.format(ids[m], data_dir, wavfiles[m]))
                     g.write('{}\t{}\n'.format(ids[m], ids[m]))
 
+        latfilename   = '%s%2.2d.lat'   % (lat_base, n)
+        nbestfilename = '%s%2.2d.nbest' % (lat_base, n)
+        wordsfilename = '%s%2.2d.words' % (lat_base, n)
+        asciifilename = '%s%2.2d.ascii' % (lat_base, n)
+        cmdfilename   = '%s%2.2d.sh'    % (cmd_base, n)
         with open(cmdfilename, 'w') as h:
-            cmd = "{} 'ark:{}' 'scp:{}' 'ark:/dev/null'\n".format(basic_cmd, spk2uttfilename, scpfilename)
             h.write('. cmd.sh\n. path.sh\n')
             if qsub:
                 h.write('module unload gcc/4.7.1 gcc/4.9.2\nmodule load python/2\nmodule swap gcc/6.2.0 gcc/7.2.0\n')
                 # "module show python/2" also loads gcc/6.2.0.
                 # Then swap that with gcc/7.2.0, for GLIBCXX_3.4.23.
-            h.write(cmd)
+            h.write("{} 'ark:{}' 'scp:{}' 'ark:{}'\n".format(basic_cmd, spk2uttfilename, scpfilename, latfilename))
+            h.write("lattice-to-nbest --acoustic-scale=0.1 --n=10 'ark:{}' 'ark:{}'\n".format(latfilename, nbestfilename))
+            h.write("nbest-to-linear 'ark:{}' ark:/dev/null 'ark,t:{}' ark:/dev/null ark:/dev/null\n".format(nbestfilename, wordsfilename))
+            h.write("utils/int2sym.pl -f 2- {}/graph/words.txt < {} > {}\n".format(lang, wordsfilename, asciifilename))
         os.chmod(cmdfilename, 0o775)
         if qsub:
             j.write('qsub -q secondary -d $PWD -l nodes=1 {}\n'.format(cmdfilename))
