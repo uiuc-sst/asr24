@@ -142,12 +142,14 @@ Choose a host to run the transcribing, e.g. campus cluster or ifp-53.  On that h
 ```
 
 - `./mkscp.py $L-8khz $(nproc) $L` splits the ASR tasks into one job per CPU core.  
-(On campus cluster, replace `$(nproc)` with a number large enough so each job completes within the secondary queue's 10-minute limit.  For Tamil, try 30.)
+(On campus cluster, replace `$(nproc)` with a number large enough so each job completes within the secondary queue's 10-minute limit.  For Tamil, try 30.)  
 It reads `$L-8khz`, the dir of 8 kHz speech files.  
-It makes $L-submit.sh.  
+It makes `$L-submit.sh`.  
 - `./$L-submit.sh` launches these jobs in parallel.
-- After those jobs complete, collect the transcriptions with `grep -h -e '^TAM_EVAL' $L/lat/*.log | sort > $L-scrips.txt` (or ...`^RUS_`, `^BABEL_`, etc.).
-- Collect each .wav file's n best transcriptions with `cat $L/lat/*.ascii | sort > $L-nbest.txt`.
+- After those jobs complete, collect the transcriptions with  
+`grep -h -e '^TAM_EVAL' $L/lat/*.log | sort > $L-scrips.txt` (or ...`^RUS_`, `^BABEL_`, etc.).
+- Collect each .wav file's n best transcriptions with  
+`cat $L/lat/*.ascii | sort > $L-nbest.txt`.
 
 ### Typical results.
 
