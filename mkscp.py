@@ -12,6 +12,7 @@ if len(sys.argv) < 4 or not sys.argv[2].isdecimal():
     print(USAGE)
     exit(1)
 dummy, data_dir, num_jobs, lang = sys.argv
+# todo: from data_dir and lang, strip any trailing slashes.
 num_jobs = int(num_jobs)
 if num_jobs < 1:
     print(USAGE)
@@ -63,7 +64,7 @@ with open(cmd_submit, 'w') as j:
         with open(scpfilename, 'w') as f:
             with open(spk2uttfilename, 'w') as g:
                 for m in range(math.ceil(n*num_per_scp), min(len(wavfiles), math.ceil((n+1)*num_per_scp))):
-                    f.write('{}\t{}{}\n'.format(ids[m], data_dir, wavfiles[m]))
+                    f.write('{}\t{}/{}\n'.format(ids[m], data_dir, wavfiles[m]))
                     g.write('{}\t{}\n'.format(ids[m], ids[m]))
 
         latfilename   = '%s%2.2d.lat'   % (lat_base, n)
