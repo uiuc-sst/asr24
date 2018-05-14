@@ -25,10 +25,9 @@ When README.md updates:
          * [Build the ASR.](#build-the-asr)
    * [Transcribe speech.](#transcribe-speech)
          * [Get speech recordings.](#get-speech-recordings)
-         * [On the campus cluster:](#on-the-campus-cluster)
-         * [On ifp-53:](#on-ifp-53)
+         * [Typical results.](#typical-results)
 
-<!-- Added by: camilleg, at: 2018-04-25T16:05-0500 -->
+<!-- Added by: camilleg, at: 2018-05-14T13:58-0500 -->
 
 <!--te-->
 
