@@ -4,7 +4,7 @@
 # lang/scp/\d\d.txt, lang/cmd/\d\d.sh, and lang/spk2utt/\d\d.txt.
 # From data_dir, use only the .wav files; ignore other files.
 
-import sys, glob, os, re, math, distutils.spawn
+import sys, glob, os, re, math
 
 USAGE='''USAGE: mkscp.py data_dir num_jobs lang_dir'''
 
@@ -47,6 +47,7 @@ for f in glob.glob(scp_base + '*') + glob.glob(spk2utt_base + '*') + glob.glob(c
 
 # Write slightly different files, depending on if this host has qsub or not.
 # Python 3.3 has a better test, shutil.which(), but campuscluster's python3 is only 3.2.
+import distutils.spawn
 qsub = distutils.spawn.find_executable("qsub") != None
 
 num_per_scp = len(wavfiles)/num_jobs
@@ -69,6 +70,7 @@ with open(cmd_submit, 'w') as j:
         nbestfilename = '%s%2.2d.nbest' % (lat_base, n)
         wordsfilename = '%s%2.2d.words' % (lat_base, n)
         asciifilename = '%s%2.2d.ascii' % (lat_base, n)
+        logfilename   = '%s%2.2d.log'   % (lat_base, n)
         cmdfilename   = '%s%2.2d.sh'    % (cmd_base, n)
         with open(cmdfilename, 'w') as h:
             h.write('. cmd.sh\n. path.sh\n')
@@ -76,8 +78,8 @@ with open(cmd_submit, 'w') as j:
                 h.write('module unload gcc/4.7.1 gcc/4.9.2\nmodule load python/2\nmodule swap gcc/6.2.0 gcc/7.2.0\n')
                 # "module show python/2" also loads gcc/6.2.0.
                 # Then swap that with gcc/7.2.0, for GLIBCXX_3.4.23.
-            h.write("{} 'ark:{}' 'scp:{}' 'ark:{}'\n".format(basic_cmd, spk2uttfilename, scpfilename, latfilename))
-            h.write("lattice-to-nbest --acoustic-scale=0.1 --n=10 'ark:{}' 'ark:{}'\n".format(latfilename, nbestfilename))
+            h.write("{} 'ark:{}' 'scp:{}' 'ark:{}' 2> {}\n".format(basic_cmd, spk2uttfilename, scpfilename, latfilename, logfilename))
+            h.write("lattice-to-nbest --acoustic-scale=0.1 --n=9 'ark:{}' 'ark:{}'\n".format(latfilename, nbestfilename))
             h.write("nbest-to-linear 'ark:{}' ark:/dev/null 'ark,t:{}' ark:/dev/null ark:/dev/null\n".format(nbestfilename, wordsfilename))
             h.write("utils/int2sym.pl -f 2- {}/graph/words.txt < {} > {}\n".format(lang, wordsfilename, asciifilename))
         os.chmod(cmdfilename, 0o775)

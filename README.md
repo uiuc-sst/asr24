@@ -141,26 +141,24 @@ Choose a host to run the transcribing, e.g. campus cluster or ifp-53.  On that h
     mv 8k $L-8khz
 ```
 
-### On campus cluster:
-- `./mkscp.py $L-8khz 20 $L` splits the transcription tasks into jobs shorter than the 10-minute maximum of the campus cluster's secondary queue.
-Its reads `$L-8khz`, a dir of 8 kHz speech files.
-`20` is the number of jobs, found empirically.
-It makes $L-submit.sh.
+- `./mkscp.py $L-8khz $(nproc) $L` splits the ASR tasks into one job per CPU core.  
+(On campus cluster, replace `$(nproc)` with a number large enough so each job completes within the secondary queue's 10-minute limit.  For Tamil, try 30.)
+It reads `$L-8khz`, the dir of 8 kHz speech files.  
+It makes $L-submit.sh.  
 - `./$L-submit.sh` launches these jobs in parallel.
-- `cat $L*.sh.e* | grep -e ^TAM_EVAL | sort`, ...`^RUS_`, `^BABEL_`, etc., extracts the transcriptions.
+- After those jobs complete, collect the transcriptions with `grep -h -e '^TAM_EVAL' $L/lat/*.log | sort > $L-scrips.txt` (or ...`^RUS_`, `^BABEL_`, etc.).
+- Collect each .wav file's n best transcriptions with `cat $L/lat/*.ascii | sort > $L-nbest.txt`.
 
-TAM_EVAL_20170601 was [transcribed](./tamil-scrips-ccluster.txt) in 45 minutes,
+### Typical results.
+
+RUS_20160930 was transcribed in 67 minutes, 13 MB/min, **12x** faster than real time.
+
+A 3.1 GB subset of Assam LDC2016E02 was transcribed in 440 minutes, 7 MB/min, **6.5x** real time.  (This may have been slower because it exhausted ifp-53's memory.)
+
+Arabic/NEMLAR_speech/NMBCN7AR, 2.2 GB (40 hours), was [transcribed](./arabic-scrips.txt) in 147 minutes, 14 MB/min, **16x** real time.  (This may have been faster because it was a few long (half-hour) files instead of many brief ones.)
+
+TAM_EVAL_20170601 was [transcribed](./tamil-scrips-ifp53.txt) in 45 minutes, 21 MB/min, **19x** real time.  
+On campus cluster, it was [transcribed](./tamil-scrips-ccluster.txt) in 45 minutes,
 but 26 of the 150 7-utterance jobs were aborted at 10 cpu-minutes
 (because some utterances are longer; mkscp.py should split jobs by .wav duration instead).
 Even accounting for that, the transcriptions differ slightly from ifp-53's.
-
-### On ifp-53:
-- `./mkscp.py $L-8khz $(nproc) $L` splits the tasks into one job per CPU core.
-- `./$L-submit.sh 2> $L.out` launches these jobs in parallel.
-- `cat $L.out | grep -e ^TAM_EVAL | sort` extracts the transcriptions.  (This isn't [Useless Use Of Cat](http://porkmail.org/era/unix/award.html) because it stops grep from thinking that `$L.out` is binary rather than text and suppressing the actual output.)
-- `cat $L/lat/*.ascii | sort` extracts the n best transcriptions of each .wav file.
-
-TAM_EVAL_20170601 was [transcribed](./tamil-scrips-ifp53.txt) in 45 minutes, 21 MB/min, **19x** faster than real time.  
-RUS_20160930 was transcribed in 67 minutes, 13 MB/min, **12x** real time.  
-A 3.1 GB subset of Assam LDC2016E02 was transcribed in 440 minutes, 7 MB/min, **6.5x** real time.  (This may have been slower because it exhausted ifp-53's memory.)  
-Arabic/NEMLAR_speech/NMBCN7AR, 2.2 GB (40 hours), was [transcribed](./arabic-scrips.txt) in 147 minutes, 14 MB/min, **16x** real time.  (This may have been faster because it was a few long (half-hour) files instead of many brief ones.)
