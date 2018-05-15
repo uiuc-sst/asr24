@@ -15,7 +15,7 @@ When README.md updates:
    * [Install software:](#install-software)
          * [Kaldi](#kaldi)
          * [This repo](#this-repo)
-         * [Krisztián Varga's <a href="https://chrisearch.wordpress.com/2017/03/11/speech-recognition-using-kaldi-extending-and-using-the-aspire-model/" rel="nofollow">extension</a> of ASpIRE](#krisztián-vargas-extension-of-aspire)
+         * [Extension of ASpIRE](#extension-of-aspire)
    * [For each language L, build an ASR:](#for-each-language-l-build-an-asr)
          * [Get raw text.](#get-raw-text)
          * [Get a G2P.](#get-a-g2p)
@@ -24,15 +24,17 @@ When README.md updates:
          * [Get recordings.](#get-recordings)
          * [Typical results.](#typical-results)
 
-<!-- Added by: camilleg, at: 2018-05-15T11:44-0500 -->
+<!-- Added by: camilleg, at: 2018-05-15T16:00-0500 -->
 
 <!--te-->
 
 # Install software:
 
 ### Kaldi
-If you don't already have a version of Kaldi newer than 2016 Sep 30, `git clone https://github.com/kaldi-asr/kaldi` and build it, following the instructions in its INSTALL files:
+If you don't already have a version of Kaldi newer than 2016 Sep 30,
+get and build it following the instructions in its INSTALL files.
 ```
+    git clone https://github.com/kaldi-asr/kaldi
     cd kaldi/tools; make -j $(nproc)
     cd ../src; ./configure --shared && make depend -j $(nproc) && make -j $(nproc)
 ```
@@ -45,8 +47,9 @@ It goes into a directory `asr24`, a sister of the usual `s5` directory.
     cd asr24
 ```
 
-### Krisztián Varga's [extension](https://chrisearch.wordpress.com/2017/03/11/speech-recognition-using-kaldi-extending-and-using-the-aspire-model/) of ASpIRE
-- Get the [ASpIRE chain model](http://kaldi-asr.org/models.html):
+### Extension of ASpIRE
+- Get the [ASpIRE chain model](http://kaldi-asr.org/models.html),
+[extended](https://chrisearch.wordpress.com/2017/03/11/speech-recognition-using-kaldi-extending-and-using-the-aspire-model/) by Krisztián Varga.
 ```
     cd kaldi/egs/aspire/asr24
     wget -qO- http://dl.kaldi-asr.org/models/0001_aspire_chain_model.tar.gz | tar xz
