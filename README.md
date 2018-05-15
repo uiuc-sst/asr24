@@ -1,11 +1,8 @@
-# asr24
-24-hour ASR
+Well within 24 hours, transcribe 40 hours of recorded speech in a surprise language.
 
-Within 24 hours, train an ASR for a surprise language L, and get native transcriptions of recorded speech.
-
-Use a pre-trained acoustic model, an L pronunciation dictionary, and an L language model.
-This approach converts phones directly to L words, instead of using multiple cross-trained ASRs to make English words
-from which phone strings are extracted, merged with [PTgen](https://github.com/uiuc-sst/PTgen), and reconstituted into L words (which turned out to be too noisy).
+Build an ASR for a surprise language L from a pre-trained acoustic model, an L pronunciation dictionary, and an L language model.
+This approach converts phones directly to L words.  This is less noisy than using multiple cross-trained ASRs to make English words
+from which phone strings are extracted, merged by [PTgen](https://github.com/uiuc-sst/PTgen), and reconstituted into L words.
 
 <!-- To refresh this TOC, 
 Just once:
@@ -31,16 +28,16 @@ When README.md updates:
 
 <!--te-->
 
-# Install software.
+# Install software:
 
-### Install Kaldi.
-If you haven't already installed a version of Kaldi newer than 2016 Sep 30, `git clone https://github.com/kaldi-asr/kaldi` and build it, following the instructions in its INSTALL files:
+### Kaldi
+If you don't already have a version of Kaldi newer than 2016 Sep 30, `git clone https://github.com/kaldi-asr/kaldi` and build it, following the instructions in its INSTALL files:
 ```
     cd kaldi/tools; make -j $(nproc)
     cd ../src; ./configure --shared && make depend -j $(nproc) && make -j $(nproc)
 ```
 
-### Get this repo's code.
+### This repo
 It goes into a directory `asr24`, a sister of the usual `s5` directory.
 ```
     cd kaldi/egs/aspire
@@ -48,7 +45,7 @@ It goes into a directory `asr24`, a sister of the usual `s5` directory.
     cd asr24
 ```
 
-### Set up Krisztián Varga's [extension](https://chrisearch.wordpress.com/2017/03/11/speech-recognition-using-kaldi-extending-and-using-the-aspire-model/) of [ASpIRE](http://kaldi-asr.org/models.html).
+### Krisztián Varga's [extension](https://chrisearch.wordpress.com/2017/03/11/speech-recognition-using-kaldi-extending-and-using-the-aspire-model/) of ASpIRE
 - Get the [ASpIRE chain model](http://kaldi-asr.org/models.html):
 ```
     cd kaldi/egs/aspire/asr24
@@ -62,7 +59,7 @@ It goes into a directory `asr24`, a sister of the usual `s5` directory.
 ```
 This builds the subdirectories `data` and `exp`.  Its last command `mkgraph.sh` can take 45 minutes and use a lot of memory because it calls `fstdeterminizestar` on a large language model, as Dan Povey [explains](https://groups.google.com/forum/#!topic/kaldi-help/3C6ypvqLpCw).
 
-- Verify that it can transcribe a recording of English speech, in mono 16-bit 8 kHz .wav format.
+- Verify that it can transcribe English, in mono 16-bit 8 kHz .wav format.
 Either use the provided 8khz.wav,
 or `sox MySpeech.wav -r 8000 8khz.wav`,
 or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000 8khz.wav`.
@@ -84,18 +81,19 @@ or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000 8khz.wav`.
       'ark:/dev/null'
 ```
 
-# For each language L, build an ASR.
+# For each language L, build an ASR:
 
-### Get raw text, G2P, etc.
+### Get raw text.
+- Into `$L/train_all/text` put word strings in L (scraped from wherever), roughly 10 words per line, at most 500k lines.  These may be quite noisy, because they'll be cleaned up.
 
-- Into `$L/train_all/text` put word strings in L (scraped from wherever), roughly 10 words per line, at most 500k lines.  These can be quite noisy, because they'll be cleaned up.
+### Get a G2P.
 - Get a G2P `g2aspire-$L.txt`, a few hundred lines each containing grapheme(s), whitespace, and space-delimited Aspire-style phones.  
 If that file has CR line terminators, convert them to standard ones in vim with the command `%s/^M/\r/g`, typing `^V` before the `^M`.  
 If that file begins with a BOM, remove it: `vi -b g2aspire-$L.txt`, and just `x` that character away.  
 
-- If you need to build the G2P, `./g2ipa2asr.py $L_wikipedia_symboltable.txt aspire2ipa.txt phoibletable.csv > g2aspire-$L.txt`.
+- If you need to build it, `./g2ipa2asr.py $L_wikipedia_symboltable.txt aspire2ipa.txt phoibletable.csv > g2aspire-$L.txt`.
 
-### Build the ASR.
+### Build an ASR.
 - `./mkprondict.py $L/train_all/text $L-g2aspire.txt $L/lang/clean.txt $L/local/dict/lexicon.txt $L/local/dict/words.txt /tmp/phones.txt /tmp/letters-culled-by-cleaning.txt` makes files needed by the subsequent steps (but the /tmp files aren't used).  
   (`/tmp/phones.txt` is a subset of `$L/local/dict/nonsilence_phones.txt`, which is the standard Aspire version.)
 - `./newlangdir_train_lms.sh $L` makes a language model for L, `$L/local/lm/3gram-mincount/lm_unpruned.gz`.
@@ -106,8 +104,8 @@ If that file begins with a BOM, remove it: `vi -b g2aspire-$L.txt`, and just `x`
   On campus cluster, `cd $L/lang; wget http://www.ifp.illinois.edu/~camilleg/e/phones.txt; cd ../graph; wget http://www.ifp.illinois.edu/~camilleg/e/words.txt`.
 - On each host that will do transcribing, `./newlangdir_make_confs.sh $L` makes some config files.
 
-# Transcribe speech.
-### Get speech recordings.
+# Transcribe speech:
+### Get recordings.
 On ifp-serv-03.ifp.illinois.edu, get LDC speech and convert it to a flat dir of 8 kHz .wav files:
 ```
     cd /ws/ifp-serv-03_1/workspace/fletcher/fletcher1/speech_data1/Russian/LDC2016E111/RUS_20160930
@@ -125,7 +123,7 @@ For BABEL .sph files:
     tar cf /tmp/foo.tar BABEL*.sph
     scp /tmp/foo.tar ifp-53:/tmp
 ```
-Then on ifp-53,
+On ifp-53,
 ```
     mkdir ~/kaldi/egs/aspire/asr24/$L-8khz
     cd myTmpSphDir
@@ -133,7 +131,7 @@ Then on ifp-53,
     for f in *.sph; do ~/kaldi/tools/sph2pipe_v2.5/sph2pipe -p -f rif "$f" /tmp/a.wav; \
         sox /tmp/a.wav -r 8000 -c 1 ~/kaldi/egs/aspire/asr24/$L-8khz/$(basename ${f%.*}.wav); done
 ```
-Choose a host to run the transcribing, e.g. campus cluster or ifp-53.  On that host:
+On the host that will run the transcribing, e.g. campus cluster or ifp-53:
 ```
     cd kaldi/egs/aspire/asr24
     wget -qO- http://www.ifp.illinois.edu/~camilleg/e/8k.tar | tar xf -
