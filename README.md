@@ -12,19 +12,19 @@ When README.md updates:
   `./gh-md-toc --insert README.md`
 -->
 <!--ts-->
-   * [asr24](#asr24)
-   * [Install software.](#install-software)
-         * [Install Kaldi.](#install-kaldi)
-         * [Get this repo's code.](#get-this-repos-code)
-         * [Set up Krisztián Varga's <a href="https://chrisearch.wordpress.com/2017/03/11/speech-recognition-using-kaldi-extending-and-using-the-aspire-model/" rel="nofollow">extension</a> of <a href="http://kaldi-asr.org/models.html" rel="nofollow">ASpIRE</a>.](#set-up-krisztián-vargas-extension-of-aspire)
-   * [For each language L, build an ASR.](#for-each-language-l-build-an-asr)
-         * [Get raw text, G2P, etc.](#get-raw-text-g2p-etc)
-         * [Build the ASR.](#build-the-asr)
-   * [Transcribe speech.](#transcribe-speech)
-         * [Get speech recordings.](#get-speech-recordings)
+   * [Install software:](#install-software)
+         * [Kaldi](#kaldi)
+         * [This repo](#this-repo)
+         * [Krisztián Varga's <a href="https://chrisearch.wordpress.com/2017/03/11/speech-recognition-using-kaldi-extending-and-using-the-aspire-model/" rel="nofollow">extension</a> of ASpIRE](#krisztián-vargas-extension-of-aspire)
+   * [For each language L, build an ASR:](#for-each-language-l-build-an-asr)
+         * [Get raw text.](#get-raw-text)
+         * [Get a G2P.](#get-a-g2p)
+         * [Build an ASR.](#build-an-asr)
+   * [Transcribe speech:](#transcribe-speech)
+         * [Get recordings.](#get-recordings)
          * [Typical results.](#typical-results)
 
-<!-- Added by: camilleg, at: 2018-05-14T13:58-0500 -->
+<!-- Added by: camilleg, at: 2018-05-15T11:44-0500 -->
 
 <!--te-->
 
