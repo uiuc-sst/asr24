@@ -164,4 +164,4 @@ but 26 of the 150 7-utterance jobs were aborted at 10 cpu-minutes
 (because some utterances are longer; mkscp.py should split jobs by .wav duration instead).
 Even accounting for that, the transcriptions differ slightly from ifp-53's.
 
-Generating lattices `$L/lat/*` took 1.04x longer for Russian, 1.7x longer for Tamil.
+Generating lattices `$L/lat/*` took 1.04x longer for Russian, 0.93x longer(!) for Arabic, 1.7x longer for Tamil.
