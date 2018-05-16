@@ -16,6 +16,7 @@ When README.md updates:
          * [Kaldi](#kaldi)
          * [This repo](#this-repo)
          * [Extension of ASpIRE](#extension-of-aspire)
+         * [CVTE Mandarin](#cvte-mandarin)
    * [For each language L, build an ASR:](#for-each-language-l-build-an-asr)
          * [Get raw text.](#get-raw-text)
          * [Get a G2P.](#get-a-g2p)
@@ -24,7 +25,7 @@ When README.md updates:
          * [Get recordings.](#get-recordings)
          * [Typical results.](#typical-results)
 
-<!-- Added by: camilleg, at: 2018-05-15T16:00-0500 -->
+<!-- Added by: camilleg, at: 2018-05-16T15:05-0500 -->
 
 <!--te-->
 
@@ -84,6 +85,32 @@ or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000 8khz.wav`.
       'ark:/dev/null'
 ```
 
+### CVTE Mandarin
+- Get the [Mandarin chain model](http://kaldi-asr.org/models.html) (3.4 GB, about 10 minutes).
+This makes a subdir cvte/s5, containing a words.txt, HCLG.fst, and final.mdl.
+```
+    wget -qO- http://kaldi-asr.org/models/0002_cvte_chain_model.tar.gz | tar xz
+```
+- Verify that this can transcribe, like ASpIRE.
+(Because its HCLG.fst is 8 GB, this takes 3.5 minutes and 16 GB of RAM.)
+
+```
+    . cmd.sh && . path.sh
+    echo "--mfcc-config=exp/tdnn_7b_chain_online/conf/mfcc.conf" > /tmp/conf
+    online2-wav-nnet3-latgen-faster \
+      --online=false  --do-endpointing=false \
+      --frame-subsampling-factor=3 \
+      --config=/tmp/conf \
+      --max-active=7000 \
+      --beam=15.0  --lattice-beam=6.0  --acoustic-scale=1.0 \
+      --word-symbol-table=cvte/s5/exp/chain/tdnn/graph/words.txt \
+      cvte/s5/exp/chain/tdnn/final.mdl \
+      cvte/s5/exp/chain/tdnn/graph/HCLG.fst \
+      'ark:echo utterance-id1 utterance-id1|' \
+      'scp:echo utterance-id1 8khz.wav|' \
+      'ark:/dev/null'
+```
+
 # For each language L, build an ASR:
 
 ### Get raw text.
@@ -97,11 +124,13 @@ If that file begins with a BOM, remove it: `vi -b g2aspire-$L.txt`, and just `x`
 - If you need to build it, `./g2ipa2asr.py $L_wikipedia_symboltable.txt aspire2ipa.txt phoibletable.csv > g2aspire-$L.txt`.
 
 ### Build an ASR.
+On ifp-53:  
 - `./mkprondict.py $L/train_all/text $L-g2aspire.txt $L/lang/clean.txt $L/local/dict/lexicon.txt $L/local/dict/words.txt /tmp/phones.txt /tmp/letters-culled-by-cleaning.txt` makes files needed by the subsequent steps (but the /tmp files aren't used).  
   (`/tmp/phones.txt` is a subset of `$L/local/dict/nonsilence_phones.txt`, which is the standard Aspire version.)
 - `./newlangdir_train_lms.sh $L` makes a language model for L, `$L/local/lm/3gram-mincount/lm_unpruned.gz`.
-- On ifp-53, `./newlangdir_make_graphs.sh $L` makes L.fst, G.fst, and then an L-customized HCLG.fst.
-- On ifp-53, `scp $L/graph/HCLG.fst cog@golubh1.campuscluster.illinois.edu:/projects/beckman/jhasegaw/kaldi/egs/aspire/asr24/$L/graph/HCLG.fst`
+- `./newlangdir_make_graphs.sh $L` makes L.fst, G.fst, and then an L-customized HCLG.fst.
+- `scp $L/graph/HCLG.fst cog@golubh1.campuscluster.illinois.edu:/projects/beckman/jhasegaw/kaldi/egs/aspire/asr24/$L/graph/HCLG.fst`
+
 - If the host that will do transcribing is the campus cluster, copy some files to it.
   On ifp-53, `cp -p $L/lang/phones.txt $L/graph/words.txt ~camilleg/l/eval/`.
   On campus cluster, `cd $L/lang; wget http://www.ifp.illinois.edu/~camilleg/e/phones.txt; cd ../graph; wget http://www.ifp.illinois.edu/~camilleg/e/words.txt`.
