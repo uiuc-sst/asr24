@@ -61,6 +61,7 @@ It goes into a directory `asr24`, a sister of the usual `s5` directory.
     utils/mkgraph.sh --self-loop-scale 1.0 data/lang_pp_test \
       exp/tdnn_7b_chain_online exp/tdnn_7b_chain_online/graph_pp
 ```
+In exp/tdnn_7b_chain_online this builds the files `phones.txt`, `tree`, `final.mdl`, `conf/`, etc.  
 This builds the subdirectories `data` and `exp`.  Its last command `mkgraph.sh` can take 45 minutes and use a lot of memory because it calls `fstdeterminizestar` on a large language model, as Dan Povey [explains](https://groups.google.com/forum/#!topic/kaldi-help/3C6ypvqLpCw).
 
 - Verify that it can transcribe English, in mono 16-bit 8 kHz .wav format.
@@ -90,6 +91,12 @@ or `ffmpeg -i MySpeech.wav -acodec pcm_s16le -ac 1 -ar 8000 8khz.wav`.
 This makes a subdir cvte/s5, containing a words.txt, HCLG.fst, and final.mdl.
 ```
     wget -qO- http://kaldi-asr.org/models/0002_cvte_chain_model.tar.gz | tar xz
+    steps/online/nnet3/prepare_online_decoding.sh \
+      --mfcc-config conf/mfcc_hires.conf \
+      data/lang_chain exp/nnet3/extractor \
+      exp/chain/tdnn_7b cvte/s5/exp/chain/tdnn
+    utils/mkgraph.sh --self-loop-scale 1.0 data/lang_pp_test \
+      cvte/s5/exp/chain/tdnn cvte/s5/exp/chain/tdnn/graph_pp
 ```
 - Verify that this can transcribe, like ASpIRE.
 (Because its HCLG.fst is 8 GB, this takes 3.5 minutes and 16 GB of RAM.)
