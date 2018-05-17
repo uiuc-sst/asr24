@@ -62,7 +62,7 @@ It goes into a directory `asr24`, a sister of the usual `s5` directory.
       exp/tdnn_7b_chain_online exp/tdnn_7b_chain_online/graph_pp
 ```
 In exp/tdnn_7b_chain_online this builds the files `phones.txt`, `tree`, `final.mdl`, `conf/`, etc.  
-This builds the subdirectories `data` and `exp`.  Its last command `mkgraph.sh` can take 45 minutes and use a lot of memory because it calls `fstdeterminizestar` on a large language model, as Dan Povey [explains](https://groups.google.com/forum/#!topic/kaldi-help/3C6ypvqLpCw).
+This builds the subdirectories `data` and `exp`.  Its last command `mkgraph.sh` can take 45 minutes (30 for CTVE Mandarin) and use a lot of memory because it calls `fstdeterminizestar` on a large language model, as Dan Povey [explains](https://groups.google.com/forum/#!topic/kaldi-help/3C6ypvqLpCw).
 
 - Verify that it can transcribe English, in mono 16-bit 8 kHz .wav format.
 Either use the provided 8khz.wav,
@@ -98,25 +98,6 @@ This makes a subdir cvte/s5, containing a words.txt, HCLG.fst, and final.mdl.
     utils/mkgraph.sh --self-loop-scale 1.0 data/lang_pp_test \
       cvte/s5/exp/chain/tdnn cvte/s5/exp/chain/tdnn/graph_pp
 ```
-- Verify that this can transcribe, like ASpIRE.
-(Because its HCLG.fst is 8 GB, this takes 3.5 minutes and 16 GB of RAM.)
-
-```
-    . cmd.sh && . path.sh
-    echo "--mfcc-config=exp/tdnn_7b_chain_online/conf/mfcc.conf" > /tmp/conf
-    online2-wav-nnet3-latgen-faster \
-      --online=false  --do-endpointing=false \
-      --frame-subsampling-factor=3 \
-      --config=/tmp/conf \
-      --max-active=7000 \
-      --beam=15.0  --lattice-beam=6.0  --acoustic-scale=1.0 \
-      --word-symbol-table=cvte/s5/exp/chain/tdnn/graph/words.txt \
-      cvte/s5/exp/chain/tdnn/final.mdl \
-      cvte/s5/exp/chain/tdnn/graph/HCLG.fst \
-      'ark:echo utterance-id1 utterance-id1|' \
-      'scp:echo utterance-id1 8khz.wav|' \
-      'ark:/dev/null'
-```
 
 # For each language L, build an ASR:
 
@@ -136,6 +117,27 @@ On ifp-53:
   (`/tmp/phones.txt` is a subset of `$L/local/dict/nonsilence_phones.txt`, which is the standard Aspire version.)
 - `./newlangdir_train_lms.sh $L` makes a language model for L, `$L/local/lm/3gram-mincount/lm_unpruned.gz`.
 - `./newlangdir_make_graphs.sh $L` makes L.fst, G.fst, and then an L-customized HCLG.fst.
+- `./newlangdir_make_graphs-cvteMandarin.sh $L` does the same, but uses a different acoustic model, and takes 50 minutes.  
+(For now, do this in a copy of the directory `$L`, to not overwrite the Aspire-model HCLG.fst.)
+- Verify that the CVTE ASR can transcribe, like ASpIRE.
+```
+    . cmd.sh && . path.sh
+    echo "--mfcc-config=cvte/s5/exp/chain/tdnn/conf/mfcc.conf" > /tmp/conf
+    echo "--ivector-extraction-config=cvte/s5/exp/chain/tdnn/conf/ivector_extractor.conf" >> /tmp/conf
+    online2-wav-nnet3-latgen-faster \
+      --online=false  --do-endpointing=false \
+      --frame-subsampling-factor=3 \
+      --config=/tmp/conf \
+      --max-active=7000 \
+      --beam=15.0  --lattice-beam=6.0  --acoustic-scale=1.0 \
+      --word-symbol-table=$L/graph/words.txt \
+      $L/final.mdl \
+      $L/graph/HCLG.fst \
+      'ark:echo utterance-id1 utterance-id1|' \
+      'scp:echo utterance-id1 $L-8khz/FILENAME.wav|' \
+      'ark:/dev/null'
+```
+
 - `scp $L/graph/HCLG.fst cog@golubh1.campuscluster.illinois.edu:/projects/beckman/jhasegaw/kaldi/egs/aspire/asr24/$L/graph/HCLG.fst`
 
 - If the host that will do transcribing is the campus cluster, copy some files to it.
