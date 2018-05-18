@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Make an IL L.fst and G.fst.  Compose them with Aspire's HC.fst, to make an HCLG.fst.
+# Make an IL L.fst and G.fst.  Compose them with an HC.fst, to make an HCLG.fst.
 # Run this on ifp-53, because campus cluster lacks a UTF-8-compatible perl needed by utils/validate_dict_dir.pl, called by utils/prepare_lang.sh.
 # (Runs on a Mac in a few hours.  Much faster than Sequitur, a full weekend.)
 # Runs Tamil on ifp-53 singlecore in 13 minutes.
@@ -62,7 +62,7 @@ EOF
 cp nonsilence_phones.txt $dict_src
 
 # Make lexiconp.txt from lexicon.txt.
-# Compile the word lexicon, L.fst.
+# Also make the word lexicon, L.fst.
 if [ $dict_src/lexiconp.txt -ot $dict_src/lexicon.txt ]; then
   # It might not have been created yet.
   rm -f $dict_src/lexiconp.txt
@@ -71,14 +71,17 @@ utils/prepare_lang.sh --phone-symbol-table $phones_src $dict_src "<unk>" $dict_t
 # (Sometimes the tamil/dict/words.txt built by prepare_lang.sh lacks a line for <unk>,
 # so I've hacked a few lines into prepare_lang.sh to fix that.)
  
-# Create the grammar/language model, G.fst.
+# Make the grammar/language model, G.fst.
 echo "$0: ngram-count"
 ngram-count -text $lang/clean.txt -order 3 -limit-vocab -vocab $dict_src/words.txt -kndiscount -interpolate -lm $lm_src || exit 1
 gzip -f $lm_src
 echo "$0: format_lm"
 utils/format_lm.sh $dict $lm_src.gz $dict_src/lexicon.txt $lang || exit 1
  
-# Assemble the HCLG graph, graph/HCLG.fst.
+# Make the HCLG graph, graph/HCLG.fst.
 # Tamil's is 360 MB.
+# Needs $lang/{L.fst, G.fst, phones.txt, words.txt, phones/silence.csl, phones/disambig.int}, $model/final.mdl, $model/tree
+# Temporarily makes $lang/tmp/LG.fst, $lang/tmp/CLG_$N_$P.fst, graph/Ha.fst, graph/HCLGa.fst.
+# Copies words.txt and phones/* from $lang to $graph.
 echo "$0: mkgraph"
 utils/mkgraph.sh --self-loop-scale 1.0 $lang $model $graph || exit 1

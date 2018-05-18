@@ -75,6 +75,7 @@ awk -v wmap=$dir/word_map 'BEGIN{ while((getline<wmap) > 0) map[$1]=$2; }
   < $cleantext | gzip -c > $dir/train.gz || exit 1
 
 echo "$0: running train_lm.sh."
+# Make the language model lm_unpruned.gz.
 rm -rf $dir/3gram-mincount # Force train_lm.sh to recalculate everything.
 train_lm.sh --arpa --lmtype 3gram-mincount $dir || exit 1
 # Or --lmtype 4gram-mincount.
