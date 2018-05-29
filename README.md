@@ -14,6 +14,7 @@ When README.md updates:
 <!--ts-->
    * [Install software:](#install-software)
          * [Kaldi](#kaldi)
+         * [brno-phnrec](#brno-phnrec)
          * [This repo](#this-repo)
          * [Extension of ASpIRE](#extension-of-aspire)
          * [CVTE Mandarin](#cvte-mandarin)
@@ -25,7 +26,7 @@ When README.md updates:
          * [Get recordings.](#get-recordings)
          * [Typical results.](#typical-results)
 
-<!-- Added by: camilleg, at: 2018-05-16T15:05-0500 -->
+<!-- Added by: camilleg, at: 2018-05-25T15:30-0500 -->
 
 <!--te-->
 
@@ -40,8 +41,18 @@ get and build it following the instructions in its INSTALL files.
     cd ../src; ./configure --shared && make depend -j $(nproc) && make -j $(nproc)
 ```
 
+### brno-phnrec
+Put Brno U. of Technology's phoneme recognizer next to the usual s5 directory.
+```
+    sudo apt-get install libopenblas-dev libopenblas-base
+    cd kaldi/egs/aspire
+    git clone https://github.com/uiuc-sst/brno-phnrec.git
+    cd brno-phnrec/PhnRec
+    make
+```
+
 ### This repo
-It goes into a directory `asr24`, a sister of the usual `s5` directory.
+Put this next to the usual `s5` directory.
 ```
     cd kaldi/egs/aspire
     git clone https://github.com/uiuc-sst/asr24.git
