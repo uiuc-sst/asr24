@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Convert an 8 kHz .wav file into a string of SAMPA phones.
+# Convert an 8 kHz .wav file into a string of IPA phones.
 
 if [ $# != 2 ]; then
   echo "Usage: $0 [cz|hu|ru] in.wav > phones.txt"
@@ -24,8 +24,10 @@ config=${dir}/PHN_${config}_SPDAT_LCRC_N1500
 
 # Run phnrec.  Discard its timing info; keep only the phones.
 # Discard useless phones.  Join them into one line.
+# Convert phones from SAMPA to IPA (*before* joining into one line,
+# because node.js javascript readline notices input only after a newline!).
 ${dir}/phnrec -c $config -i $2 -o /dev/stdout |
-  cut -f3 -d' ' | grep -Ev 'int|pau|spk' | tr '\n' ' '
+  cut -f3 -d' ' | grep -Ev 'int|pau|spk' | ./sampa2ipa.js | tr '\n' ' '
 
 # Append a newline.
 echo

@@ -52,8 +52,10 @@ Put Brno U. of Technology's phoneme recognizer next to the usual s5 directory.
 ```
 
 ### This repo
-Put this next to the usual `s5` directory.
+Put this next to the usual `s5` directory.  
+(The package nodejs is for `./sampa2ipa.js`.)
 ```
+    sudo apt-get install nodejs
     cd kaldi/egs/aspire
     git clone https://github.com/uiuc-sst/asr24.git
     cd asr24
