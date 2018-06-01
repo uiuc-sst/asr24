@@ -8,6 +8,8 @@
 // Luis González Miranda's https://tools.lgm.cl/xsampa.html
 // http://www.public.asu.edu/~athxo/convert_to_ipa.htm
 
+// Called by phnrec.sh.
+
 const readline = require('readline');
 const rl = readline.createInterface({
   input: process.stdin,

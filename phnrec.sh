@@ -27,7 +27,7 @@ config=${dir}/PHN_${config}_SPDAT_LCRC_N1500
 # Convert phones from SAMPA to IPA (*before* joining into one line,
 # because node.js javascript readline notices input only after a newline!).
 ${dir}/phnrec -c $config -i $2 -o /dev/stdout |
-  cut -f3 -d' ' | grep -Ev 'int|pau|spk' | ./sampa2ipa.js | tr '\n' ' '
+  cut -f3 -d' ' | grep -Ev 'int|pau|spk' | ./sampa2ipa.js | tr '\n' ' ' | ./ipa2aspire.rb
 
 # Append a newline.
 echo
