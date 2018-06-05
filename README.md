@@ -126,16 +126,16 @@ If that file begins with a BOM, remove it: `vi -b g2aspire-$L.txt`, and just `x`
 
 ### Build an ASR.
 On ifp-53:  
-- `./mkprondict.py $L` reads `$L/train_all/text` and makes files needed by the subsequent steps, including `$L/local/dict/lexicon.txt` and `$L/local/dict/words.txt`.  
+- `./run.sh $L` makes an L-customized HCLG.fst.  
+*(To instead run individual stages of run.sh:*  
+- `./mkprondict.py $L` reads `$L/train_all/text` and makes files needed by the subsequent stages, including `$L/local/dict/lexicon.txt` and `$L/local/dict/words.txt`.  
 - `./newlangdir_train_lms.sh $L` makes a language model for L, `$L/local/lm/3gram-mincount/lm_unpruned.gz`.
-- `./newlangdir_make_graphs.sh $L` makes L.fst, G.fst, and then an L-customized HCLG.fst.
-(Or do all of the above with one command:  `./run.sh $L`.)
+- `./newlangdir_make_graphs.sh $L` makes L.fst, G.fst, and then `$L/graph/HCLG.fst`.  
+*)*  
 
-- `scp $L/graph/HCLG.fst cog@golubh1.campuscluster.illinois.edu:/projects/beckman/jhasegaw/kaldi/egs/aspire/asr24/$L/graph/HCLG.fst`
-
-- If the host that will do transcribing is the campus cluster, copy some files to it.
-  On ifp-53, `cp -p $L/lang/phones.txt $L/graph/words.txt ~camilleg/l/eval/`.
-  On campus cluster, `cd $L/lang; wget http://www.ifp.illinois.edu/~camilleg/e/phones.txt; cd ../graph; wget http://www.ifp.illinois.edu/~camilleg/e/words.txt`.
+- If the host that will do transcribing is the campus cluster, copy some files to it.  
+  On ifp-53, `cp -p $L/lang/phones.txt $L/graph/words.txt $L/graph/HCLG.fst ~camilleg/l/eval/`.  
+  On campus cluster, `cd $L/lang; wget http://www.ifp.illinois.edu/~camilleg/e/phones.txt; cd ../graph; wget http://www.ifp.illinois.edu/~camilleg/e/words.txt; wget http://www.ifp.illinois.edu/~camilleg/e/HCLG.fst`.  
 - On each host that will do transcribing, `./newlangdir_make_confs.sh $L` makes some config files.
 
 # Transcribe speech:
