@@ -126,30 +126,10 @@ If that file begins with a BOM, remove it: `vi -b g2aspire-$L.txt`, and just `x`
 
 ### Build an ASR.
 On ifp-53:  
-- `./mkprondict.py $L/train_all/text $L-g2aspire.txt $L/lang/clean.txt $L/local/dict/lexicon.txt $L/local/dict/words.txt /tmp/phones.txt /tmp/letters-culled-by-cleaning.txt` makes files needed by the subsequent steps (but the /tmp files aren't used).  
-  (`/tmp/phones.txt` is a subset of `$L/local/dict/nonsilence_phones.txt`, which is the standard Aspire version.)
+- `./mkprondict.py $L` reads `$L/train_all/text` and makes files needed by the subsequent steps, including `$L/local/dict/lexicon.txt` and `$L/local/dict/words.txt`.  
 - `./newlangdir_train_lms.sh $L` makes a language model for L, `$L/local/lm/3gram-mincount/lm_unpruned.gz`.
 - `./newlangdir_make_graphs.sh $L` makes L.fst, G.fst, and then an L-customized HCLG.fst.
-- `./newlangdir_make_graphs-cvteMandarin.sh $L` does the same, but uses a different acoustic model, and takes 50 minutes.  
-(For now, do this in a copy of the directory `$L`, to not overwrite the Aspire-model HCLG.fst.)
-- Verify that the CVTE ASR can transcribe, like ASpIRE.
-```
-    . cmd.sh && . path.sh
-    echo "--mfcc-config=cvte/s5/exp/chain/tdnn/conf/mfcc.conf" > /tmp/conf
-    echo "--ivector-extraction-config=cvte/s5/exp/chain/tdnn/conf/ivector_extractor.conf" >> /tmp/conf
-    online2-wav-nnet3-latgen-faster \
-      --online=false  --do-endpointing=false \
-      --frame-subsampling-factor=3 \
-      --config=/tmp/conf \
-      --max-active=7000 \
-      --beam=15.0  --lattice-beam=6.0  --acoustic-scale=1.0 \
-      --word-symbol-table=$L/graph/words.txt \
-      $L/final.mdl \
-      $L/graph/HCLG.fst \
-      'ark:echo utterance-id1 utterance-id1|' \
-      'scp:echo utterance-id1 $L-8khz/FILENAME.wav|' \
-      'ark:/dev/null'
-```
+(Or do all of the above with one command:  `./run.sh $L`.)
 
 - `scp $L/graph/HCLG.fst cog@golubh1.campuscluster.illinois.edu:/projects/beckman/jhasegaw/kaldi/egs/aspire/asr24/$L/graph/HCLG.fst`
 

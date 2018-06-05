@@ -1,26 +1,28 @@
 #!/usr/bin/env python3
 
-# Inputs:
-#   in.txt, raw IL prose; at most 60 MB (5M words, 500k lines) to keep this fast.
-#   in.g2aspire.dict, a g2p for IL using Aspire's phonemes.
-# Outputs:
-#   out.txt, a cleaned-up in.txt: keep only the chars in in.g2aspire.dict, and eliminate >2 repeated chars.
-#   out.dict, the words from out.txt, each with a pronunciation estimated from in.g2aspire.dict.
-# Other outputs:
-#   words.txt, out.txt's words.
-#   phones.txt, the phones used by words.txt.
-#   missing.txt, any characters in in.txt that were not in in.g2aspire.dict.
-
 import sys
 import os
 import re
 
-USAGE='''USAGE: mkprondict.py in.txt in.g2aspire.dict out.txt out.dict words.txt phones.txt missing.txt'''
+USAGE='''USAGE: mkprondict.py <newlangdir>'''
 
-if len(sys.argv) != 8:
+if len(sys.argv) != 2:
     print(USAGE)
     exit(1)
-dummy, fileIntxt, fileIndict, fileOuttxt, fileOutdict, fileWords, filePhones, fileMissingchars = sys.argv
+L = sys.argv[1]
+
+# Inputs.
+fileIntxt = L + "/train_all/text"   # Raw IL prose; at most 60 MB (5M words, 500k lines) to keep this fast.
+fileIndict = L + "-g2aspire.txt"    # A g2p for IL using Aspire's phonemes.
+
+# Outputs.
+fileOuttxt = L + "/lang/clean.txt"  # Cleaned-up fileIntxt.  keep only the chars in in.g2aspire.dict, and eliminate >2 repeated chars.
+fileOutdict = L + "/local/dict/lexicon.txt" # fileOuttxt's words, each with a pronunciation estimated from fileIndict.
+
+# Extra outputs.
+fileWords = L + "/local/dict/words.txt" # fileOuttxt's words.
+filePhones = "/tmp/phones.txt"          # fileOuttxt's phones, a subset of L/local/dict/nonsilence_phones.txt, which is the standard Aspire version.
+fileMissingchars = "/tmp/letters-culled-by-cleaning.txt"    # Any characters in fileIntxt that were not in fileIndict.
 
 # Make dirs of output files.
 for filename in [fileOuttxt, fileOutdict, fileMissingchars, fileWords, filePhones]:
