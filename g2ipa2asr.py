@@ -16,6 +16,9 @@ USAGE='''g2ipa2asr.py g2ipa.txt asr2ipa.txt phoibletable.csv > g2asr.txt
    The output may include zero-length pronunciations.
 '''
 
+# This repo's phoibletable.csv is mirrored from:
+# wget https://raw.githubusercontent.com/uiuc-sst/g2ps/master/_config/phoibletable.csv
+
 if len(sys.argv) < 4:
     print(USAGE)
     exit(0)
