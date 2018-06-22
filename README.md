@@ -179,6 +179,10 @@ It makes `$L-submit.sh`.
 - `./$L-submit.sh` launches these jobs in parallel.
 - After those jobs complete, collect the transcriptions with  
 `grep -h -e '^TAM_EVAL' $L/lat/*.log | sort > $L-scrips.txt` (or ...`^RUS_`, `^BABEL_`, etc.).
+- To sftp transcriptions to Jon May as `elisa.tam-eng.eval-asr-uiuc.y3r1.v8.xml.gz`,
+with timestamp June 11 and version 8,  
+`grep -h -e '^TAM_EVAL' tamil/lat/*.log | sort | sed -e 's/ /\t/' | ./hyp2jonmay.rb /tmp/jon-tam tam 20180611 8`  
+(If UTF-8 errors occur, simplify letters by appending to the sed command args such as `-e 's/Ñ/N/g'`.)
 - Collect each .wav file's n best transcriptions with  
 `cat $L/lat/*.ascii | sort > $L-nbest.txt`.
 
