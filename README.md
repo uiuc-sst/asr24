@@ -129,7 +129,7 @@ On ifp-53:
 - `./run.sh $L` makes an L-customized HCLG.fst.  
 *(To instead run individual stages of run.sh:*  
 - `./mkprondict.py $L` reads `$L/train_all/text` and makes files needed by the subsequent stages, including `$L/local/dict/lexicon.txt` and `$L/local/dict/words.txt`.  
-- `./newlangdir_train_lms.sh $L` makes a language model for L, `$L/local/lm/3gram-mincount/lm_unpruned.gz`.
+- `./newlangdir_train_lms.sh $L` makes a word-trigram language model for L, `$L/local/lm/3gram-mincount/`.
 - `./newlangdir_make_graphs.sh $L` makes L.fst, G.fst, and then `$L/graph/HCLG.fst`.  
 *)*  
 

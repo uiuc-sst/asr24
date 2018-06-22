@@ -12,9 +12,10 @@ if [ $# != 1 ]; then
   echo "Inputs and outputs are all in <newlangdir>."
   echo "Inputs: local/dict/lexicon.txt, lang/clean.txt."
   # Intermediate outputs: local/lm/{text.no_oov, word.counts, unigram.counts, word_map, train.gz, wordlist.mapped}
-  echo "Output: local/lm/3gram-mincount/lm_unpruned.gz."
+  echo "Output: local/lm/3gram-mincount/*.*."
   # Output, from train_lm.sh at the end of this script, also includes
   # local/lm/3gram-mincount/{ngrams.gz, heldout_ngrams.gz, ngrams_disc.gz, configs, perplexities, ...}.
+  # With train_lm.sh --arpa, output also includes ARPA-format lm_unpruned.gz, but that's unused by the rest of ASR24.
   exit 1
 fi
 [ ! -d $1 ] && echo "$0: missing directory $1. Aborting." && exit 1
@@ -77,8 +78,7 @@ awk -v wmap=$dir/word_map 'BEGIN{ while((getline<wmap) > 0) map[$1]=$2; }
 echo "$0: running train_lm.sh."
 # Make the language model lm_unpruned.gz.
 rm -rf $dir/3gram-mincount # Force train_lm.sh to recalculate everything.
-train_lm.sh --arpa --lmtype 3gram-mincount $dir || exit 1
-# Or --lmtype 4gram-mincount.
+train_lm.sh --lmtype 3gram-mincount $dir || exit 1
 
 # Mark:
 # Perplexity over 88307.000000 words (excluding 691.000000 OOVs) is 71.241332
