@@ -74,10 +74,11 @@ utils/prepare_lang.sh --phone-symbol-table $phones_src $dict_src "<unk>" $dict_t
 #     word_count=`tail -n 1 $dir/words.txt | awk '{ print $2 }'`
 #     echo "<unk>" | awk -v WC=$word_count '{ printf("%s %d\n", $1, ++WC); }' >> $dir/words.txt
  
-# Make the grammar/language model, G.fst.
+# Make $lm_src.gz.
 echo "$0: ngram-count"
 ngram-count -text $lang/clean.txt -order 3 -limit-vocab -vocab $dict_src/words.txt -kndiscount -interpolate -lm $lm_src || exit 1
 gzip -f $lm_src
+# Make the grammar/language model, $lang/G.fst, from the ARPA-format LM $lm_src.gz.
 echo "$0: format_lm"
 utils/format_lm.sh $dict $lm_src.gz $dict_src/lexicon.txt $lang || exit 1
  
