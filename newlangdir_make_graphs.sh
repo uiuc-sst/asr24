@@ -69,7 +69,10 @@ if [ $dict_src/lexiconp.txt -ot $dict_src/lexicon.txt ]; then
 fi
 utils/prepare_lang.sh --phone-symbol-table $phones_src $dict_src "<unk>" $dict_tmp $dict || exit 1
 # (Sometimes the tamil/dict/words.txt built by prepare_lang.sh lacks a line for <unk>,
-# so I've hacked a few lines into prepare_lang.sh to fix that.)
+# so to fix that I added a few lines into utils/prepare_lang.sh,
+# just before the line that defiles silphone:
+#     word_count=`tail -n 1 $dir/words.txt | awk '{ print $2 }'`
+#     echo "<unk>" | awk -v WC=$word_count '{ printf("%s %d\n", $1, ++WC); }' >> $dir/words.txt
  
 # Make the grammar/language model, G.fst.
 echo "$0: ngram-count"
