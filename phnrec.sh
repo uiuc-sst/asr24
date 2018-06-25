@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Convert an 8 kHz .wav file into a string of IPA phones.
+# Convert an 8 kHz .wav file into a string of Aspire phones.
 
 if [ $# != 2 ]; then
   echo "Usage: $0 [cz|hu|ru] in.wav > phones.txt"
