@@ -67,31 +67,32 @@ with open(fileIntxt, 'r', encoding='utf-8') as f:
             outwords = []
             # Regex \d\s works better than \W in python 3.4.3
             for word in re.split('[\d\s]+', line.strip().upper()):
+		if not word:
+		    continue
                 if word in prondict:
                     # This word already appeared in fileIntxt.
                     outwords.append(word)
-                elif word:
-                    rec = []
-                    pron = ''
-                    while word:
-                        # Find the longest-matching char sequence.
-                        for n in range(min(len(word), len(g2p)), -1, -1):
-                            if n == 0:
-                                # Character missing, so delete it from cleaned output.
-                                missingchars[word[0]] = 1
-                                word = word[1:]
-                                break
-                            elif word[0:n] in g2p[n-1]:
-                                # Keep this to cleaned output only if it's not a triple-repetition.
-                                if len(rec)<2 or word[0:n] != rec[-1] or rec[-1] != rec[-2]:
-                                    rec.append(word[0:n])
-                                    pron += ' ' + g2p[n-1][word[0:n]]
-                                word = word[n:]
-                                break
-                    if rec:
-                        rec = ''.join(rec)
-                        prondict[rec] = pron
-                        outwords.append(rec)
+		rec = []
+		pron = ''
+		while word:
+		    # Find the longest-matching char sequence.
+		    for n in range(min(len(word), len(g2p)), -1, -1):
+			if n == 0:
+			    # Character missing, so delete it from cleaned output.
+			    missingchars[word[0]] = 1
+			    word = word[1:]
+			    break
+			elif word[0:n] in g2p[n-1]:
+			    # Keep this to cleaned output only if it's not a triple-repetition.
+			    if len(rec)<2 or word[0:n] != rec[-1] or rec[-1] != rec[-2]:
+				rec.append(word[0:n])
+				pron += ' ' + g2p[n-1][word[0:n]]
+			    word = word[n:]
+			    break
+		if rec:
+		    rec = ''.join(rec)
+		    prondict[rec] = pron
+		    outwords.append(rec)
             if outwords:
                 g.write(' '.join(outwords) + '\n')
 
