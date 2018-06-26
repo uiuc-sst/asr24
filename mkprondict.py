@@ -72,6 +72,7 @@ with open(fileIntxt, 'r', encoding='utf-8') as f:
                 if word in prondict:
                     # This word already appeared in fileIntxt.
                     outwords.append(word)
+                    continue
                 rec = []
                 pron = ''
                 while word:
