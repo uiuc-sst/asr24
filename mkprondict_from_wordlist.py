@@ -61,7 +61,7 @@ with open(fileInwords, 'r', encoding='utf-8') as f:
     for line in f:
         # Assume one word per line.  Strip off newline, and uppercase it.
         word = line.rstrip().upper()
-        if not word:
+        if not word or word == '<UNK>' or word == '</S>' or word == '<S>':
             continue
         if word in prondict:
             print('Invalid duplicate word ' + word + ' in cleaned wordlist ' + fileInwords)
