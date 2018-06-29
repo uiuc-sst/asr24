@@ -67,7 +67,6 @@ end
 
 ARGF.set_encoding(Encoding::UTF_8).each_line {|l|
   l = l.chomp.split(/\s/)
-  # (l[0] + "\t").encoding is already UTF-8!
   print l[0] + "\t"
   s = ''.encode('utf-8')
   l[1..-1].each {|asp|
@@ -75,6 +74,5 @@ ARGF.set_encoding(Encoding::UTF_8).each_line {|l|
     s += out ? out : asp
     s += ' '
   }
-  # s.rstrip.encoding is already UTF-8!
-  puts s.rstrip # .encode("ISO-8859-1:UTF-8")
+  puts s.strip
 }
