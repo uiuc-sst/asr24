@@ -23,9 +23,10 @@ dir=../brno-phnrec/PhnRec
 config=${dir}/PHN_${config}_SPDAT_LCRC_N1500
 
 # Run phnrec.  Discard its timing info; keep only the phones.
-# Discard useless phones.  Join them into one line.
+# Discard useless phones.
 # Convert phones from SAMPA to IPA (*before* joining into one line,
-# because node.js javascript readline notices input only after a newline!).
+# because node.js javascript's readline notices input only after a newline!).
+# Join phones into one line.
 ${dir}/phnrec -c $config -i $2 -o /dev/stdout |
   cut -f3 -d' ' | grep -Ev 'int|pau|spk' | ./sampa2ipa.js | tr '\n' ' ' | ./ipa2aspire.rb
 
