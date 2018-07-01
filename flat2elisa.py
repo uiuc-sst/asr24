@@ -79,6 +79,7 @@ def main():
   else:
     atexit.register(cleanwork)
 
+  #os.system("rm -f /tmp/asr24-flat2elisa-problems.txt") # See below.
   outfile = prepfile(args.outfile, 'w')
   
   infilenames = []
@@ -138,8 +139,8 @@ def main():
       sys.stderr.write("{} had a problem.\n".format(infile))
       # For Tagalog, fix this problem by filtering the input with sed -e 's/Ñ/N/g'.
       # For Swahili, sed -e "s/’/'/g".
-      # To isolate such problems, uncomment the next line:
-      # os.system("cat " + infile + " >> /tmp/flat2elisa-problems.txt")
+      # To isolate such problems, uncomment the next line, and the similar line at the top:
+      # os.system("cat " + infile + " >> /tmp/asr24-flat2elisa-problems.txt")
     outfile.write("</DOCUMENT>\n")
   outfile.write("</ELISA_LRLP_CORPUS>\n")
 
