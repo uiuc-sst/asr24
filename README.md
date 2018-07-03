@@ -1,16 +1,3 @@
-```html
-<style type="text/css">
-DIV.repository-content {
-display: table
-}
-DIV.js-repo-meta-container {
-display: table-caption
-}
-DIV.readme {
-display: table-header-group
-}
-</style>
-```
 Well within 24 hours, transcribe 40 hours of recorded speech in a surprise language.
 
 Build an ASR for a surprise language L from a pre-trained acoustic model, an L pronunciation dictionary, and an L language model.
