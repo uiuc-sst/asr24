@@ -1,4 +1,5 @@
-```css
+```html
+<style type="text/css">
 DIV.repository-content {
 display: table
 }
@@ -8,6 +9,7 @@ display: table-caption
 DIV.readme {
 display: table-header-group
 }
+</style>
 ```
 Well within 24 hours, transcribe 40 hours of recorded speech in a surprise language.
 
