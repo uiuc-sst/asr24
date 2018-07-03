@@ -43,7 +43,8 @@ if not os.path.exists(lat_base):
     os.mkdir(lat_base)
 
 # Remove previously made files.
-for f in glob.glob(scp_base + '*') + glob.glob(spk2utt_base + '*') + glob.glob(cmd_base + '*') + glob.glob(lat_base + '*'):
+# DON'T remove lat_base/*, though.  Leave that until submit-foo.sh.
+for f in glob.glob(scp_base + '*') + glob.glob(spk2utt_base + '*') + glob.glob(cmd_base + '*'):
     os.remove(f)
 
 # Write slightly different files, depending on if this host has qsub or not.
@@ -58,6 +59,7 @@ basic_cmd = 'online2-wav-nnet3-latgen-faster --online=false --frame-subsampling-
 cmd_submit = lang + '-submit.sh'
 with open(cmd_submit, 'w') as j:
     j.write('#!/usr/bin/env bash\n')
+    j.write('rm -rf %s; mkdir %s\n' % (lat_base, lat_base))
     for n in range(0, num_jobs):
         scpfilename = '%s%2.2d.txt' % (scp_base, n)
         spk2uttfilename = '%s%2.2d.txt' % (spk2utt_base, n)
@@ -68,9 +70,9 @@ with open(cmd_submit, 'w') as j:
                     g.write('{}\t{}\n'.format(ids[m], ids[m]))
 
         latfilename   = '%s%2.2d.lat'   % (lat_base, n)
-        nbestfilename = '%s%2.2d.nbest' % (lat_base, n)
-        wordsfilename = '%s%2.2d.words' % (lat_base, n)
-        asciifilename = '%s%2.2d.ascii' % (lat_base, n)
+#       nbestfilename = '%s%2.2d.nbest' % (lat_base, n)
+#       wordsfilename = '%s%2.2d.words' % (lat_base, n)
+#       asciifilename = '%s%2.2d.ascii' % (lat_base, n)
         logfilename   = '%s%2.2d.log'   % (lat_base, n)
         cmdfilename   = '%s%2.2d.sh'    % (cmd_base, n)
         with open(cmdfilename, 'w') as h:
@@ -80,9 +82,9 @@ with open(cmd_submit, 'w') as j:
                 # "module show python/2" also loads gcc/6.2.0.
                 # Then swap that with gcc/7.2.0, for GLIBCXX_3.4.23.
             h.write("{} 'ark:{}' 'scp:{}' 'ark:{}' 2> {}\n".format(basic_cmd, spk2uttfilename, scpfilename, latfilename, logfilename))
-            h.write("lattice-to-nbest --acoustic-scale=0.1 --n=9 'ark:{}' 'ark:{}'\n".format(latfilename, nbestfilename))
-            h.write("nbest-to-linear 'ark:{}' ark:/dev/null 'ark,t:{}' ark:/dev/null ark:/dev/null\n".format(nbestfilename, wordsfilename))
-            h.write("utils/int2sym.pl -f 2- {}/graph/words.txt < {} > {}\n".format(lang, wordsfilename, asciifilename))
+#           h.write("lattice-to-nbest --acoustic-scale=0.1 --n=9 'ark:{}' 'ark:{}'\n".format(latfilename, nbestfilename))
+#           h.write("nbest-to-linear 'ark:{}' ark:/dev/null 'ark,t:{}' ark:/dev/null ark:/dev/null\n".format(nbestfilename, wordsfilename))
+#           h.write("utils/int2sym.pl -f 2- {}/graph/words.txt < {} > {}\n".format(lang, wordsfilename, asciifilename))
         os.chmod(cmdfilename, 0o775)
         if qsub:
             j.write('qsub -q secondary -d $PWD -l nodes=1 {}\n'.format(cmdfilename))
