@@ -2,29 +2,29 @@
 
 # Split a listing of jobs into num_jobs script files and spk2utt files, called
 # lang/scp/\d\d.txt, lang/cmd/\d\d.sh, and lang/spk2utt/\d\d.txt.
-# From data_dir, use only the .wav files; ignore other files.
+# From dirWav, use only the .wav files; ignore other files.
 
 import sys, glob, os, re, math
 
-USAGE='''USAGE: mkscp.py data_dir num_jobs lang_dir'''
+USAGE='''USAGE: mkscp.py wav_dir num_jobs lang_dir'''
 
 if len(sys.argv) < 4 or not sys.argv[2].isdecimal():
     print(USAGE)
     exit(1)
-dummy, data_dir, num_jobs, lang = sys.argv
-# todo: from data_dir and lang, strip any trailing slashes.
+dummy, dirWav, num_jobs, lang = sys.argv
+# todo: from dirWav and lang, strip any trailing slashes.
 num_jobs = int(num_jobs)
 if num_jobs < 1:
     print(USAGE)
     exit(1)
-if not os.path.exists(data_dir):
-    print('mkscp.py: missing directory ' + data_dir)
+if not os.path.exists(dirWav):
+    print('mkscp.py: missing directory ' + dirWav)
     exit(1)
 
-wavfiles = os.listdir(data_dir)
+wavfiles = os.listdir(dirWav)
 ids = [ re.sub(r'.*/', '', re.sub(r'\..*', '', x)) for x in wavfiles ]
 if not ids:
-    print('mkscp.py: no .wav files in directory ' + data_dir)
+    print('mkscp.py: no .wav files in directory ' + dirWav)
     exit(1)
 
 if not os.path.exists(lang):
@@ -52,7 +52,7 @@ for f in glob.glob(scp_base + '*') + glob.glob(spk2utt_base + '*') + glob.glob(c
 import distutils.spawn
 qsub = distutils.spawn.find_executable("qsub") != None
 
-num_per_scp = len(wavfiles)/num_jobs
+num_per_job = len(wavfiles)/num_jobs
 
 basic_cmd = 'online2-wav-nnet3-latgen-faster --online=false --frame-subsampling-factor=3 --config={}/conf/online.conf --max-active=7000 --beam=15.0 --lattice-beam=6.0 --acoustic-scale=1.0 --word-symbol-table={}/graph/words.txt exp/tdnn_7b_chain_online/final.mdl {}/graph/HCLG.fst'.format(lang,lang,lang)
 
@@ -65,8 +65,8 @@ with open(cmd_submit, 'w') as j:
         spk2uttfilename = '%s%2.2d.txt' % (spk2utt_base, n)
         with open(scpfilename, 'w') as f:
             with open(spk2uttfilename, 'w') as g:
-                for m in range(math.ceil(n*num_per_scp), min(len(wavfiles), math.ceil((n+1)*num_per_scp))):
-                    f.write('{}\t{}/{}\n'.format(ids[m], data_dir, wavfiles[m]))
+                for m in range(math.ceil(n*num_per_job), min(len(wavfiles), math.ceil((n+1)*num_per_job))):
+                    f.write('{}\t{}/{}\n'.format(ids[m], dirWav, wavfiles[m]))
                     g.write('{}\t{}\n'.format(ids[m], ids[m]))
 
         latfilename   = '%s%2.2d.lat'   % (lat_base, n)
