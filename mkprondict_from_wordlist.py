@@ -1,25 +1,22 @@
 #!/usr/bin/env python3
 
-import sys
-import os
-import re
+import sys, os, re
 
 USAGE='''USAGE: mkprondict_from_wordlist.py <newlangdir>.  Make prondict from input wordlist, which is assumed to already match the language model.'''
-
 if len(sys.argv) != 2:
     print(USAGE)
     exit(1)
 L = sys.argv[1]
 
 # Inputs.
-fileInwords = L + "/local/dict/words.txt"   # Input wordlist, one word per line
-fileIndict = L + "-g2aspire.txt"    # A g2p for IL using Aspire's phonemes.
+fileInwords = L + "/local/dict/words.txt"   # Input wordlist, one word per line.
+fileIndict = L + "-g2aspire.txt"    # A g2p for IL using Aspire's phonemes.  If there's a choice, graphemes must be lower case.
 
 # Outputs.
 fileOutdict = L + "/local/dict/lexicon.txt" # fileOuttxt's words, each with a pronunciation estimated from fileIndict.
 
 # Extra outputs.
-filePhones = "/tmp/phones.txt"          # fileOuttxt's phones, a subset of L/local/dict/nonsilence_phones.txt, which is the standard Aspire version.
+filePhones = "/tmp/phones-" + L + ".txt" # fileOuttxt's phones, a subset of L/local/dict/nonsilence_phones.txt, which is the standard Aspire version.
 
 # Make dirs of output files.
 for filename in [fileOutdict, filePhones]:
@@ -54,42 +51,61 @@ if phonesBogus:
     print('Invalid phones in ' + fileIndict + ': ' + str(phonesBogus))
     exit(1)
 
+abort = False
 # Read fileInwords.  Convert words.
 prondict = {}
 with open(fileInwords, 'r', encoding='utf-8') as f:
     print('Making prondict from %s.' % fileInwords)
     for line in f:
         # Assume one word per line.  Strip off newline, and uppercase it.
-        word = line.rstrip().upper()
-        if not word or word == '<UNK>' or word == '</S>' or word == '<S>':
+        wordOriginal = wordM = line.rstrip() # M means mixed case.
+        if not wordM:
             continue
-        if word in prondict:
-            print('Invalid duplicate word ' + word + ' in cleaned wordlist ' + fileInwords)
-            exit(1)
-        rec = []
+        word = wordM.upper()
+        if word == '<UNK>' or word == '</S>' or word == '<S>':
+            continue
+        if wordM in prondict:
+            print('Wordlist ' + fileInwords + ' has invalid duplicate word ' + wordM + '.')
+            abort = True
+            continue
+        rec = [] # Accumulate the word's letters that got g2p'd ok.
         pron = ''
+        # Look up the *non-mixedcase* word's letters in the g2p.
+        # Keep word and wordM in sync.
         while word:
-            # Find the longest-matching char sequence.
+            # Find the longest-matching char sequence at the start of word[].
             for n in range(min(len(word), len(g2p)), -1, -1):
                 if n == 0:
-                    print('Invalid char "' + word[0] + '" in cleaned wordlist ' + fileInwords)
-                    exit(1)
-                elif word[0:n] in g2p[n-1]:
-                    rec.append(word[0:n])
-                    pron += ' ' + g2p[n-1][word[0:n]]
+                    # word[] shrank to nothing, so the character word[0] was missing from the g2p.
+                    print('Wordlist ' + fileInwords + ' has g2p-missing grapheme "' + word[0].lower() + '" in word "' + wordOriginal + '"')
+                    # If the grapheme is really obscure, in a loanword, such as Ḥ of alḤasan in the context of Kinyarwanda,
+                    # then correct the grapheme in the supposedly clean wordlist,
+                    # instead of growing the g2p or extending this source code.
+                    word = ""
+                    abort = True
+                    break
+                prefix = word[0:n]
+                prefixM = wordM[0:n]
+                if prefix in g2p[n-1]:
+                    # Found this prefix.
+                    rec.append(prefixM)
+                    pron += ' ' + g2p[n-1][prefix]
+                    # Continue past the g2p-matched prefix.
                     word = word[n:]
+                    wordM = wordM[n:]
                     break
         if rec:
             prondict[''.join(rec)] = pron
+if abort:
+    exit(1)
 
-# Write the dictionary.
+# Write the prondict and the phone list.
+print('Writing {}'.format(fileOutdict))
 with open(fileOutdict, 'w', encoding='utf-8') as f:
-    print('Writing {}'.format(fileOutdict))
     for (k,v) in sorted(prondict.items()):
         f.write('%s %s\n' % (k,v))
 
-# Write the list of phones.
+print('Writing {}'.format(filePhones))
 with open(filePhones, 'w') as f:
-    print('Writing {}'.format(filePhones))
     for (n,p) in enumerate(sorted(phoneset.keys())):
         f.write('{}\n'.format(p))
