@@ -133,6 +133,8 @@ On ifp-53:
 - `./newlangdir_make_graphs.sh $L` makes L.fst, G.fst, and then `$L/graph/HCLG.fst`.  
 *)*  
 
+- (Or, to use a prebuilt LM, `./run_from_wordlist.sh $L`.  See that script for usage.)  
+
 - If the host that will do transcribing is the campus cluster, copy some files to it.  
   On ifp-53, `cp -p $L/lang/phones.txt $L/graph/words.txt $L/graph/HCLG.fst ~camilleg/l/eval/`.  
   On campus cluster, `cd $L/lang; wget http://www.ifp.illinois.edu/~camilleg/e/phones.txt; cd ../graph; wget http://www.ifp.illinois.edu/~camilleg/e/words.txt; wget http://www.ifp.illinois.edu/~camilleg/e/HCLG.fst`.  
