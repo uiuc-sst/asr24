@@ -119,15 +119,8 @@ def main():
     outfile.write("  <DIRECTION>%s</DIRECTION>\n" % args.direction)
     currstart = 0
     try:
-      bar = prepfile(infile, 'r')
-      #sys.stderr.write("Trying '{}'.\n".format(infile))
-      foo = enumerate(bar)
-      #sys.stderr.write("Enumerated. {}.\n".format(bar))
-      #sys.stderr.write("Enumerated; is {}.\n".format(type(foo)))
-      for ln, line in foo:
-        #sys.stderr.write("a\n")
+      for ln, line in enumerate(prepfile(infile, 'r')):
         line = line.strip()
-        #sys.stderr.write("Reached '{}'.\n".format(line))
         segroot = ET.Element('SEGMENT')
         xroot = ET.SubElement(segroot, 'SOURCE')
         currend = currstart+len(line)-1
@@ -142,22 +135,15 @@ def main():
         subelements.append(("MD5_HASH_SOURCE",
                             hashlib.md5(line.encode('utf-8')).hexdigest()))
         subelements.append(("ORIG_RAW_SOURCE", line))
-        #sys.stderr.write("b\n")
         for key, text in subelements:
           se = ET.SubElement(xroot, key)
           se.text = text
-        #sys.stderr.write("c\n")
         xmlstr = ET.tostring(segroot, pretty_print=True, # DON'T DO THIS: encoding='utf-8',
                              xml_declaration=False).decode('utf-8')
-        #sys.stderr.write("d\n")
-        outfile.write(xmlstr) # , encoding='utf-8') # crashes in here
-        # outfile.write(xmlstr.encode('ascii', 'ignore')) fails: TypeError: must be str, not bytes
-        #sys.stderr.write("e\n")
+        outfile.write(xmlstr)
     except Exception as ex:
       sys.stderr.write("{} had a problem.\n".format(infile))
       sys.stderr.write(''.join(traceback.format_exception(etype=type(ex), value=ex, tb=ex.__traceback__)))
-      # UnicodeEncodeError: 'ascii' codec can't encode characters in position 361-367: ordinal not in range(128)
-      #
       # Are the next 3 lines fixed, now, by "DON'T DO THIS"?
       # For Tagalog, fix this problem by filtering the input with sed -e 's/Ñ/N/g'.
       # For Swahili, sed -e "s/’/'/g".
