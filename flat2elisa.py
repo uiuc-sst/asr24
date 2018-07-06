@@ -30,24 +30,30 @@ import shutil
 import atexit
 import hashlib
 import lxml.etree as ET
+import traceback
 
 scriptdir = os.path.dirname(os.path.abspath(__file__))
 reader = codecs.getreader('utf8')
 writer = codecs.getwriter('utf8')
 
 def prepfile(fh, code):
-  if type(fh) is str:
-    fh = open(fh, code)
-  ret = gzip.open(fh.name, code if code.endswith("t") else code+"t") if fh.name.endswith(".gz") else fh
-  if sys.version_info[0] == 2:
-    if code.startswith('r'):
-      ret = reader(fh)
-    elif code.startswith('w'):
-      ret = writer(fh)
-    else:
-      sys.stderr.write("I didn't understand code "+code+"\n")
-      sys.exit(1)
-  return ret
+  try:
+    if type(fh) is str:
+      fh = open(fh, code, encoding='utf-8')
+    ret = gzip.open(fh.name, code if code.endswith("t") else code+"t") if fh.name.endswith(".gz") else fh
+    if sys.version_info[0] == 2:
+      if code.startswith('r'):
+        ret = reader(fh)
+      elif code.startswith('w'):
+        ret = writer(fh)
+      else:
+        sys.stderr.write("I didn't understand code "+code+"\n")
+        sys.exit(1)
+    return ret
+  except:
+    sys.stderr.write("prepfile failed.\n")
+    sys.exit(1)
+    return 0
 
 def addonoffarg(parser, arg, dest=None, default=True, help="TODO"):
   ''' add the switches --arg and --no-arg that set parser.arg to true/false, respectively'''
@@ -79,7 +85,7 @@ def main():
   else:
     atexit.register(cleanwork)
 
-  #os.system("rm -f /tmp/asr24-flat2elisa-problems.txt") # See below.
+  os.system("rm -f /tmp/asr24-flat2elisa-problems.txt") # See below.
   outfile = prepfile(args.outfile, 'w')
   
   infilenames = []
@@ -113,8 +119,15 @@ def main():
     outfile.write("  <DIRECTION>%s</DIRECTION>\n" % args.direction)
     currstart = 0
     try:
-      for ln, line in enumerate(prepfile(infile, 'r')):
+      bar = prepfile(infile, 'r')
+      #sys.stderr.write("Trying '{}'.\n".format(infile))
+      foo = enumerate(bar)
+      #sys.stderr.write("Enumerated. {}.\n".format(bar))
+      #sys.stderr.write("Enumerated; is {}.\n".format(type(foo)))
+      for ln, line in foo:
+        #sys.stderr.write("a\n")
         line = line.strip()
+        #sys.stderr.write("Reached '{}'.\n".format(line))
         segroot = ET.Element('SEGMENT')
         xroot = ET.SubElement(segroot, 'SOURCE')
         currend = currstart+len(line)-1
@@ -129,18 +142,27 @@ def main():
         subelements.append(("MD5_HASH_SOURCE",
                             hashlib.md5(line.encode('utf-8')).hexdigest()))
         subelements.append(("ORIG_RAW_SOURCE", line))
+        #sys.stderr.write("b\n")
         for key, text in subelements:
           se = ET.SubElement(xroot, key)
           se.text = text
-        xmlstr = ET.tostring(segroot, pretty_print=True, encoding='utf-8',
+        #sys.stderr.write("c\n")
+        xmlstr = ET.tostring(segroot, pretty_print=True, # DON'T DO THIS: encoding='utf-8',
                              xml_declaration=False).decode('utf-8')
-        outfile.write(xmlstr)
-    except:
+        #sys.stderr.write("d\n")
+        outfile.write(xmlstr) # , encoding='utf-8') # crashes in here
+        # outfile.write(xmlstr.encode('ascii', 'ignore')) fails: TypeError: must be str, not bytes
+        #sys.stderr.write("e\n")
+    except Exception as ex:
       sys.stderr.write("{} had a problem.\n".format(infile))
+      sys.stderr.write(''.join(traceback.format_exception(etype=type(ex), value=ex, tb=ex.__traceback__)))
+      # UnicodeEncodeError: 'ascii' codec can't encode characters in position 361-367: ordinal not in range(128)
+      #
+      # Are the next 3 lines fixed, now, by "DON'T DO THIS"?
       # For Tagalog, fix this problem by filtering the input with sed -e 's/Ñ/N/g'.
       # For Swahili, sed -e "s/’/'/g".
       # To isolate such problems, uncomment the next line, and the similar line at the top:
-      # os.system("cat " + infile + " >> /tmp/asr24-flat2elisa-problems.txt")
+      os.system("cat " + infile + " >> /tmp/asr24-flat2elisa-problems.txt")
     outfile.write("</DOCUMENT>\n")
   outfile.write("</ELISA_LRLP_CORPUS>\n")
 
