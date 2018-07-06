@@ -76,13 +76,13 @@ with open(fileInwords, 'r', encoding='utf-8') as f:
             # Find the longest-matching char sequence at the start of word[].
             for n in range(min(len(word), len(g2p)), -1, -1):
                 if n == 0:
-                    # word[] shrank to nothing, so the character word[0] was missing from the g2p.
+                    # No prefix matched, so the character word[0] was missing from the g2p.
                     print('Wordlist ' + fileInwords + ' has g2p-missing grapheme "' + word[0].lower() + '" in word "' + wordOriginal + '"')
                     # If the grapheme is really obscure, in a loanword, such as Ḥ of alḤasan in the context of Kinyarwanda,
                     # then correct the grapheme in the supposedly clean wordlist,
                     # instead of growing the g2p or extending this source code.
                     word = ""
-                    abort = True
+                    rec = [] # Just remove this word from the g2p.
                     break
                 prefix = word[0:n]
                 prefixM = wordM[0:n]
@@ -97,6 +97,7 @@ with open(fileInwords, 'r', encoding='utf-8') as f:
         if rec:
             prondict[''.join(rec)] = pron
 if abort:
+    print('Aborting due to duplicate words.')
     exit(1)
 
 # Write the prondict and the phone list.
