@@ -118,11 +118,11 @@ This makes a subdir cvte/s5, containing a words.txt, HCLG.fst, and final.mdl.
 - Into `$L/train_all/text` put word strings in L (scraped from wherever), roughly 10 words per line, at most 500k lines.  These may be quite noisy, because they'll be cleaned up.
 
 ### Get a G2P.
-- Get a G2P `g2aspire-$L.txt`, a few hundred lines each containing grapheme(s), whitespace, and space-delimited Aspire-style phones.  
-If that file has CR line terminators, convert them to standard ones in vim with the command `%s/^M/\r/g`, typing `^V` before the `^M`.  
-If that file begins with a BOM, remove it: `vi -b g2aspire-$L.txt`, and just `x` that character away.  
+- Into `$L/train_all/g2aspire.txt` put a G2P, a few hundred lines each containing grapheme(s), whitespace, and space-delimited Aspire-style phones.  
+If it has CR line terminators, convert them to standard ones in vi with `%s/^M/\r/g`, typing control-V before the `^M`.  
+If it starts with a [BOM](https://en.wikipedia.org/wiki/Byte_order_mark), remove it: `vi -b g2aspire.txt`, and just `x` that character away.  
 
-- If you need to build it, `./g2ipa2asr.py $L_wikipedia_symboltable.txt aspire2ipa.txt phoibletable.csv > g2aspire-$L.txt`.
+- If you need to build the G2P, `./g2ipa2asr.py $L_wikipedia_symboltable.txt aspire2ipa.txt phoibletable.csv > $L/train_all/g2aspire.txt`.
 
 ### Build an ASR.
 On ifp-53:  

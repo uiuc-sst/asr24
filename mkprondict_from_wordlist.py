@@ -10,7 +10,7 @@ L = sys.argv[1]
 
 # Inputs.
 fileInwords = L + "/local/dict/words.txt"   # Input wordlist, one word per line.
-fileIndict = L + "-g2aspire.txt"    # A g2p for IL using Aspire's phonemes.  If there's a choice, graphemes must be lower case.
+fileIndict = L + "/train_all/g2aspire.txt"    # A g2p for IL using Aspire's phonemes.  If there's a choice, graphemes must be lower case.
 
 # Outputs.
 fileOutdict = L + "/local/dict/lexicon.txt" # fileOuttxt's words, each with a pronunciation estimated from fileIndict.

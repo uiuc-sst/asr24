@@ -10,7 +10,7 @@ L = sys.argv[1]
 
 # Inputs.
 fileIntxt = L + "/train_all/text"   # Raw IL prose; at most 60 MB (5M words, 500k lines) to keep this fast.
-fileIndict = L + "-g2aspire.txt"    # A g2p for IL using Aspire's phonemes.  If there's a choice, graphemes must be lower case.
+fileIndict = L + "/train_all/g2aspire.txt"    # A g2p for IL using Aspire's phonemes.  If there's a choice, graphemes must be lower case.
 
 # Outputs.
 fileOuttxt = L + "/lang/clean.txt"  # Cleaned-up fileIntxt.  Keep only the chars in in.g2aspire.dict.  Eliminate >2 repeated chars.
@@ -30,7 +30,7 @@ if L == 'kinyar':
     # Map ' and ’ to nothing, to stop n’abakene from collapsing into nabakene or abakene.
     # (Those two graphemes are almost never quotation marks, in Kinyarwanda.)
     # Don't map to <eps> because that's not in silence.txt etc.  Don't map to sil.
-    # Not in kinyar-g2aspire.txt, because that file can't encode an absent pronunciation.
+    # Don't do this in fileIndict, because that can't encode an absent pronunciation.
     g2p = [{'\'': '', '’': ''}]
 else:
     g2p = []
