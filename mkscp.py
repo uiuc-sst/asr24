@@ -12,7 +12,6 @@ if len(sys.argv) < 4 or not sys.argv[2].isdecimal():
     print(USAGE)
     exit(1)
 dummy, dirWav, num_jobs, lang = sys.argv
-# todo: from dirWav and lang, strip any trailing slashes.
 num_jobs = int(num_jobs)
 if num_jobs < 1:
     print(USAGE)
