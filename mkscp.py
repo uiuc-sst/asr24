@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+print("use mkscp.rb instead")
+exit(1)
+
 # Split a listing of jobs into num_jobs script files and spk2utt files, called
 # lang/scp/\d\d.txt, lang/cmd/\d\d.sh, and lang/spk2utt/\d\d.txt.
 # From dirWav, use only the .wav files; ignore other files.

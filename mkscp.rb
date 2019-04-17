@@ -20,7 +20,7 @@ if $numJobs < 1
   exit 1
 end
 
-$wavs = Dir.glob($dirWav + "/*.wav") .map {|f| File.basename(f)}
+$wavs = Dir.glob($dirWav + "/*.wav")
 if $wavs.empty?
   STDERR.puts "#$0: no .wav files in directory #$dirWav"
   exit 1
@@ -62,14 +62,56 @@ $basic_cmd = "online2-wav-nnet3-latgen-faster --online=false --frame-subsampling
   --acoustic-scale=1.0 --word-symbol-table=#$lang/graph/words.txt \
   exp/tdnn_7b_chain_online/final.mdl #$lang/graph/HCLG.fst"
 
-# Distribute indexes of .wav's into $numJobs bins, naively for now.
+# Measure byte length of each wav.
+$lens = $wavs.map {|f| File.size(f)}
+
+# Distribute indexes of .wav's into $numJobs bins.
 $bins = Array.new($numJobs) {[]}
-$numJobs.times {|i|
-  ((i*$num_per_job).ceil ... [((i+1)*$num_per_job).ceil, $wavs.size].min).each {|m|
-    $bins[i] << m
+if true
+
+  FIXNUM_MAX =  (2**(0.size*8 - 2) - 1)
+  FIXNUM_MIN = -(2**(0.size*8 - 2))
+  wavsUnassigned = (0...$wavs.size).to_a
+
+  while !wavsUnassigned.empty?
+    # Of the unassigned wavs, find the longest one.
+    iwavLongest = -1
+    lenMax = 0
+    wavsUnassigned.each {|iWav| 
+      if $lens[iWav] > lenMax
+	lenMax = $lens[iWav]
+	iwavLongest = iWav
+      end
+    }
+    # Find the least-full bin.
+    iBinEmptiest = -1
+    lenMin = FIXNUM_MAX
+    $bins.each_with_index {|b,iBin|
+      if b.empty?
+	iBinEmptiest = iBin
+	break # Trivially the least full.
+      end
+      len = b.map {|iWav| $lens[iWav]} .inject('+')
+      if len < lenMin
+	lenMin = len
+	iBinEmptiest = iBin
+      end
+    }
+    # Move iwavLongest from wavsUnassigned to $bins[iBinEmptiest].
+    $bins[iBinEmptiest] << iwavLongest
+    wavsUnassigned.delete iwavLongest
+  end
+  # For Somali, the resulting bin lengths vary by only 2%.
+else
+  # For Somali, the resulting bin lengths vary by 3700%.
+  $numJobs.times {|i|
+    ((i*$num_per_job).ceil ... [((i+1)*$num_per_job).ceil, $wavs.size].min).each {|m|
+      $bins[i] << m
+    }
   }
-}
+end
 $bins.freeze
+# $bins.each {|b| puts "#{b.map {|iWav| $lens[iWav]} .inject('+')} bytes, #{b.size} elements."}; exit 0
 
 $cmd_submit = $lang + '-submit.sh'
 File.open($cmd_submit, "w") {|j|
@@ -80,7 +122,7 @@ File.open($cmd_submit, "w") {|j|
     $spk2uttfilename = "#$spk2utt_base#$i.txt"
 
     File.open($scpfilename, "w") {|f|
-      $bins[i].each {|m| f.puts "#{$ids[m]}\t#$dirWav/#{$wavs[m]}"}
+      $bins[i].each {|m| f.puts "#{$ids[m]}\t#{$wavs[m]}"}
     }
     File.open($spk2uttfilename, "w") {|f|
       $bins[i].each {|m| f.puts "#{$ids[m]}\t#{$ids[m]}"}
@@ -93,7 +135,7 @@ File.open($cmd_submit, "w") {|j|
     $logfilename   = "#$lat_base#$i.log"
     $cmdfilename   = "#$cmd_base#$i.sh"
     File.open($cmdfilename, "w") {|h|
-      h.puts ". cmd.sh\n. path.sh"
+      h.puts ". cmd.sh; . path.sh"
       h.puts "module unload gcc/4.7.1 gcc/4.9.2\nmodule load python/2\nmodule swap gcc/6.2.0 gcc/7.2.0" if qsub
       h.puts "#$basic_cmd 'ark:#$spk2uttfilename' 'scp:#$scpfilename' 'ark:#$latfilename' 2> #$logfilename"
 #     h.puts "lattice-to-nbest --acoustic-scale=0.1 --n=9 'ark:#$latfilename' 'ark:#$nbestfilename'"
