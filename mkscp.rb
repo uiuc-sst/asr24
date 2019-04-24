@@ -135,7 +135,7 @@ File.open($cmd_submit, "w") {|j|
     $logfilename   = "#$lat_base#$i.log"
     $cmdfilename   = "#$cmd_base#$i.sh"
     File.open($cmdfilename, "w") {|h|
-      h.puts ". cmd.sh; . path.sh"
+      h.puts ". cmd.sh || exit 1; . path.sh || exit 1"
       h.puts "module unload gcc/4.7.1 gcc/4.9.2\nmodule load python/2\nmodule swap gcc/6.2.0 gcc/7.2.0" if qsub
       h.puts "#$basic_cmd 'ark:#$spk2uttfilename' 'scp:#$scpfilename' 'ark:#$latfilename' 2> #$logfilename"
 #     h.puts "lattice-to-nbest --acoustic-scale=0.1 --n=9 'ark:#$latfilename' 'ark:#$nbestfilename'"
