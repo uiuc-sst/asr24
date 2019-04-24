@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# Input files come from Gina:
-# copy LANG_arpa.lm.gz to LANG/lang/lm.arpa.gz;
-# copy LANG_unigrams.txt(.gz) to LANG/local/dict/words.txt.
+# Input files come from Gina.
+# Copy LANG_arpa.lm.gz to LANG/lang/lm.arpa.gz.
+# Copy LANG_unigrams.txt(.gz) to LANG/local/dict/words.txt.
 # Then run this script.
 
 # Run each stage.
