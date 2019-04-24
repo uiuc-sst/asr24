@@ -73,6 +73,9 @@ with open(fileIntxt, 'r', encoding='utf-8') as f:
     with open(fileOuttxt, 'w', encoding='utf-8') as g:
         print('Cleaning text from %s into %s.' % (fileIntxt, fileOuttxt))
         for line in f:
+            # If this crashes with "UnicodeDecodeError: 'utf-8' codec can't decode byte",
+            # find the offending input line with:
+            # iconv -f utf-8 -t ascii//TRANSLIT < inputfile | wc -l
             outwords = []
             # Regex \d\s works better than \W in python 3.4.3
             # M means mixed case.
