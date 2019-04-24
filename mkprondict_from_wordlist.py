@@ -55,6 +55,7 @@ abort = False
 # Read fileInwords.  Convert words.
 prondict = {}
 with open(fileInwords, 'r', encoding='utf-8') as f:
+    ok = True
     print('Making prondict from %s.' % fileInwords)
     for line in f:
         # Assume one word per line.  Strip off newline, and uppercase it.
@@ -78,6 +79,8 @@ with open(fileInwords, 'r', encoding='utf-8') as f:
                 if n == 0:
                     # No prefix matched, so the character word[0] was missing from the g2p.
                     print('Wordlist ' + fileInwords + ' has g2p-missing grapheme "' + word[0].lower() + '" in word "' + wordOriginal + '"')
+                    #print(word[0].lower())
+                    ok = False
                     # If the grapheme is really obscure, in a loanword, such as Ḥ of alḤasan in the context of Kinyarwanda,
                     # then correct the grapheme in the supposedly clean wordlist,
                     # instead of growing the g2p or extending this source code.
@@ -96,6 +99,9 @@ with open(fileInwords, 'r', encoding='utf-8') as f:
                     break
         if rec:
             prondict[''.join(rec)] = pron
+if not ok:
+    print('Aborting due to missing graphemes.')
+    exit(1)
 if abort:
     print('Aborting due to duplicate words.')
     exit(1)
