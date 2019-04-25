@@ -125,17 +125,14 @@ If it starts with a [BOM](https://en.wikipedia.org/wiki/Byte_order_mark), remove
 - If you need to build the G2P, `./g2ipa2asr.py $L_wikipedia_symboltable.txt aspire2ipa.txt phoibletable.csv > $L/train_all/g2aspire.txt`.
 
 ### Build an ASR.
-On ifp-53:  
 - `./run.sh $L` makes an L-customized HCLG.fst.  
-*(To instead run individual stages of run.sh:*  
+<!-- (To instead run individual stages of run.sh:  
 - `./mkprondict.py $L` reads `$L/train_all/text` and makes files needed by the subsequent stages, including `$L/local/dict/lexicon.txt` and `$L/local/dict/words.txt`.  
 - `./newlangdir_train_lms.sh $L` makes a word-trigram language model for L, `$L/local/lm/3gram-mincount/`.
 - `./newlangdir_make_graphs.sh $L` makes L.fst, G.fst, and then `$L/graph/HCLG.fst`.  
-*)*  
+)  -->
 
-- (Or, to use a prebuilt LM, `./run_from_wordlist.sh $L`.  See that script for usage.)  
-
-- On each host that will do transcribing, `./newlangdir_make_confs.sh $L` makes some config files.
+- To instead use a prebuilt LM, `./run_from_wordlist.sh $L`.  See that script for usage.
 
 # Transcribe speech:
 ### Get recordings.
