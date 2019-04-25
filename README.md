@@ -135,9 +135,6 @@ On ifp-53:
 
 - (Or, to use a prebuilt LM, `./run_from_wordlist.sh $L`.  See that script for usage.)  
 
-- If the host that will do transcribing is the campus cluster, copy some files to it.  
-  On ifp-53, `cp -p $L/lang/phones.txt $L/graph/words.txt $L/graph/HCLG.fst ~camilleg/l/eval/`.  
-  On campus cluster, `cd $L/lang; wget http://www.ifp.illinois.edu/~camilleg/e/phones.txt; cd ../graph; wget http://www.ifp.illinois.edu/~camilleg/e/words.txt; wget http://www.ifp.illinois.edu/~camilleg/e/HCLG.fst`.  
 - On each host that will do transcribing, `./newlangdir_make_confs.sh $L` makes some config files.
 
 # Transcribe speech:
@@ -167,15 +164,15 @@ On ifp-53,
     for f in *.sph; do ~/kaldi/tools/sph2pipe_v2.5/sph2pipe -p -f rif "$f" /tmp/a.wav; \
         sox /tmp/a.wav -r 8000 -c 1 ~/kaldi/egs/aspire/asr24/$L-8khz/$(basename ${f%.*}.wav); done
 ```
-On the host that will run the transcribing, e.g. campus cluster or ifp-53:
+On the host that will run the transcribing, e.g. ifp-53:
 ```
     cd kaldi/egs/aspire/asr24
     wget -qO- http://www.ifp.illinois.edu/~camilleg/e/8k.tar | tar xf -
     mv 8k $L-8khz
 ```
 
-- `./mkscp.py $L-8khz $(nproc) $L` splits the ASR tasks into one job per CPU core.  
-(On campus cluster, replace `$(nproc)` with a number large enough so each job completes within the secondary queue's 10-minute limit.  For Tamil, try 30.)  
+- `./mkscp.rb $L-8khz $(nproc) $L` splits the ASR tasks into one job per CPU core,
+each job with roughly the same audio duration.  
 It reads `$L-8khz`, the dir of 8 kHz speech files.  
 It makes `$L-submit.sh`.  
 - `./$L-submit.sh` launches these jobs in parallel.
@@ -197,7 +194,5 @@ A 3.1 GB subset of Assam LDC2016E02 was transcribed in 440 minutes, 7 MB/min, **
 Arabic/NEMLAR_speech/NMBCN7AR, 2.2 GB (40 hours), was [transcribed](./arabic-scrips.txt) in 147 minutes, 14 MB/min, **16x** real time.  (This may have been faster because it was a few long (half-hour) files instead of many brief ones.)
 
 TAM_EVAL_20170601 was [transcribed](./tamil-scrips-ifp53.txt) in 45 minutes, 21 MB/min, **19x** real time.  
-On campus cluster, it was [transcribed](./tamil-scrips-ccluster.txt) in 45 minutes,
-but 26 of the 150 7-utterance jobs were aborted at 10 cpu-minutes.
 
 Generating lattices `$L/lat/*` took 1.04x longer for Russian, 0.93x longer(!) for Arabic, 1.7x longer for Tamil.
