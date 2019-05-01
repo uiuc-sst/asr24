@@ -9,13 +9,13 @@
 # Mostly copied from https://github.com/uiuc-sst/PTgen's steps/hyp2jonmay.rb.
 
 if ARGV.size != 4
-  STDERR.puts "Usage: #$0 jonmay_dir three_letter_language_code date_USC versionNumber < transcriptions.txt > jonmay_transcriptions.txt"
+  STDERR.puts "Usage: #$0 jonmay_dir three_letter_language_code date_USC versionNumber < transcriptions.txt"
   exit 1
 end
 $jonmaydir = ARGV[0]
 
-$sourceLanguage = ARGV[1]
-$genre = "SP" # "SP"eech
+$sourceLanguage = ARGV[1].upcase
+$genre = "SP" # "SP"eech.  Or "NW" for newswire.
 $provenance = "000000" # Media outlet.  Unknown.
 $date = ARGV[2] # "20180611"
 $langForJon = $sourceLanguage.downcase
@@ -29,7 +29,7 @@ $stdin.set_encoding(Encoding::UTF_8).each_line {|l|
     next
   end
   begin
-    indexID = uttid[8..-1].gsub /[_a-zA-Z]/, ""
+    indexID = uttid[8..-1].gsub(/[_a-zA-Z]/, "") + ".0"
   rescue
     STDERR.puts "#$0: expected uttid, tab, transcription in input line '#{l}'."
     next
@@ -42,4 +42,4 @@ $tojon = "elisa.#{$langForJon}-eng.eval-asr-uiuc.y3r1.v#$version.xml"
 
 STDERR.puts `./flat2elisa.py -i #$jonmaydir -l #$langForJon -o #$tojon`
 `rm -rf #$tojon.gz #$jonmaydir; gzip --best #$tojon`
-STDERR.puts "Please sftp to Jon the file #$tojon.gz."
+STDERR.puts "Please sftp to Jon the file #$tojon.gz"
