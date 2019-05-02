@@ -104,23 +104,19 @@ def main():
   outfile.write('<?xml version="1.0" encoding="UTF-8"?>\n')
   outfile.write('<!DOCTYPE ELISA_LRLP_CORPUS SYSTEM "elisa.lrlp.v1.1.dtd">\n')
   outfile.write('<ELISA_LRLP_CORPUS source_language="{}">\n'.format(args.language))
-  for infile in infilenames:
-    try:
-      fullid = os.path.basename(infile).split('.')[0]
-      idtoks = fullid.split('_')
-      if len(idtoks) != len(fullidfields):
-        raise
-    except:
-      sys.stderr.write("{} is not in proper naming convention; skipping\n".format(infile))
-      continue
+  for infile in sorted(infilenames):
+    fullid = os.path.basename(infile).split('.')[0]
     outfile.write('<DOCUMENT id="{}">\n'.format(fullid))
-    for label, value in zip(fullidfields, idtoks):
+    idtoks = fullid.split('_')
+    fakeidtoks = [idtoks.pop(0), "SP", "000000", "00000000", idtoks.pop(1) + idtoks.pop(1)]
+    for label, value in zip(fullidfields, fakeidtoks):
       outfile.write("  <{label}>{value}</{label}>\n".format(label=label, value=value))
     outfile.write("  <DIRECTION>%s</DIRECTION>\n" % args.direction)
     currstart = 0
     try:
       for ln, line in enumerate(prepfile(infile, 'r')):
         line = line.strip()
+        #works: os.system("echo " + line + " >> /tmp/flat2elisa-debug.txt")
         segroot = ET.Element('SEGMENT')
         xroot = ET.SubElement(segroot, 'SOURCE')
         currend = currstart+len(line)-1
@@ -134,11 +130,12 @@ def main():
         subelements.append(("ORIG_FILENAME", os.path.basename(infile))) # for nistification
         subelements.append(("MD5_HASH_SOURCE",
                             hashlib.md5(line.encode('utf-8')).hexdigest()))
+        # hex digits:  os.system("echo " + hashlib.md5(line.encode('utf-8')).hexdigest() + " >> /tmp/flat2elisa-debug.txt")
         subelements.append(("ORIG_RAW_SOURCE", line))
         for key, text in subelements:
           se = ET.SubElement(xroot, key)
           se.text = text
-        xmlstr = ET.tostring(segroot, pretty_print=True, # DON'T DO THIS: encoding='utf-8',
+        xmlstr = ET.tostring(segroot, pretty_print=True, encoding='utf-8', # *DO* encode as utf-8 for Hindi.
                              xml_declaration=False).decode('utf-8')
         outfile.write(xmlstr)
     except Exception as ex:

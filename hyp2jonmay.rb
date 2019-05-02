@@ -8,18 +8,15 @@
 
 # Mostly copied from https://github.com/uiuc-sst/PTgen's steps/hyp2jonmay.rb.
 
-if ARGV.size != 4
-  STDERR.puts "Usage: #$0 jonmay_dir three_letter_language_code date_USC versionNumber < transcriptions.txt"
+if ARGV.size != 3
+  STDERR.puts "Usage: #$0 jonmay_dir three_letter_language_code versionNumber < transcriptions.txt"
   exit 1
 end
 $jonmaydir = ARGV[0]
 
 $sourceLanguage = ARGV[1].upcase
-$genre = "SP" # "SP"eech.  Or "NW" for newswire.
-$provenance = "000000" # Media outlet.  Unknown.
-$date = ARGV[2] # "20180611"
 $langForJon = $sourceLanguage.downcase
-$version = ARGV[3] # e.g., 1, 2, ...
+$version = ARGV[2] # e.g., 1, 2, ...
 
 `rm -rf #$jonmaydir; mkdir #$jonmaydir`
 $stdin.set_encoding(Encoding::UTF_8).each_line {|l|
@@ -28,17 +25,10 @@ $stdin.set_encoding(Encoding::UTF_8).each_line {|l|
     STDERR.puts "#$0: expected uttid, tab, transcription in input line '#{l}'."
     next
   end
-  begin
-    indexID = uttid[8..-1].gsub(/[_a-zA-Z]/, "") + ".0"
-  rescue
-    STDERR.puts "#$0: expected uttid, tab, transcription in input line '#{l}'."
-    next
-  end
-  name = "#{$sourceLanguage}_#{$genre}_#{$provenance}_#{$date}_#{indexID}"
-  File.open("#$jonmaydir/#{name}.txt", "w") {|f| f.puts scrip}
+  File.open("#$jonmaydir/#{uttid}.txt", "w") {|f| f.puts scrip}
 }
 
-$tojon = "elisa.#{$langForJon}-eng.eval-asr-uiuc.y3r1.v#$version.xml"
+$tojon = "elisa.#{$langForJon}-eng.eval-asr-uiuc-s#$version.y4r1.v1.xml"
 
 STDERR.puts `./flat2elisa.py -i #$jonmaydir -l #$langForJon -o #$tojon`
 `rm -rf #$tojon.gz #$jonmaydir; gzip --best #$tojon`
