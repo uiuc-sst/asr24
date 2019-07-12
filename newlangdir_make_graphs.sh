@@ -48,7 +48,6 @@ lm_src=$lang/lm.arpa
 [ ! -d $model ] && echo "$0: missing directory $model. Aborting." && exit 1
 [ ! -f $phones_src ] && echo "$0: missing file $phones_src. Aborting." && exit 1
 [ ! -f nonsilence_phones.txt ] && echo "$0: missing file nonsilence_phones.txt. Aborting." && exit 1
-
 echo "$0: prepare_lang"
 # Make some files.
 echo "sil laughter noise oov" > $dict_src/extra_questions.txt
@@ -76,6 +75,7 @@ utils/prepare_lang.sh --phone-symbol-table $phones_src $dict_src "<unk>" $dict_t
  
 # Make $lm_src.gz.
 echo "$0: ngram-count"
+# When using a trie, omit -kndiscount.
 ngram-count -text $lang/clean.txt -order 3 -limit-vocab -vocab $dict_src/words.txt -kndiscount -interpolate -lm $lm_src || exit 1
 gzip -f $lm_src
 # Make the grammar/language model, $lang/G.fst, from the ARPA-format LM $lm_src.gz.

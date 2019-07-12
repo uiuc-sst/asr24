@@ -182,6 +182,10 @@ with timestamp June 11 and version 8,
 - Collect each .wav file's n best transcriptions with  
 `cat $L/lat/*.ascii | sort > $L-nbest.txt`.
 
+### Special postprocessing.
+If your transcriptions used nonsense English words, convert them to phones and then, via a trie, into L-words:
+- `./trie-$L.rb < trie1-scrips.txt > $L-trie-scrips.txt`.
+
 ### Typical results.
 
 RUS_20160930 was transcribed in 67 minutes, 13 MB/min, **12x** faster than real time.
