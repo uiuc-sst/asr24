@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 # encoding: utf-8
 
-# Usage: $0 < trie1-scrips.txt > kinyar-trie-scrips.txt
+# Usage: $0 < trie2-scrips.txt > sinhal-trie-scrips.txt
 # The input is transcriptions made of nonsense English words.
 
-$phoneFile = 'kinyar.g2p' # From /ws/ifp-53_1/hasegawa/tools/cog/g2ps-aspire/Kinyarwanda_wikipedia_symboltable.txt.
+$phoneFile = 'sinhal.g2p' # From /ws/ifp-53_1/hasegawa/tools/cog/g2ps-aspire/Sinhalese_wikipedia_symboltable.txt.
 $g2p = File.readlines($phoneFile) .map {|s| s.downcase.chomp.split("\t")}
 $phones = $g2p.map {|s| s[1].split(' ')} .flatten .sort .uniq
 # $phones.each {|ph| puts ph}; exit 1
@@ -12,7 +12,7 @@ $phones = $g2p.map {|s| s[1].split(' ')} .flatten .sort .uniq
 # Read transcriptions made of nonsense English words.
 $scrips = ARGF.readlines .map {|s| s.split(' ')}
 
-$prondict = File.readlines('trie1/train_all/cmudict-plain.txt') \
+$prondict = File.readlines('trie2/train_all/cmudict-plain.txt') \
   .map {|s| s.downcase.chomp.split("\t") } \
   .delete_if {|s| /[a-z]/ !~ s[0][0]}		# Omit words that begin with a nonletter.
 $pd = {}
@@ -24,17 +24,16 @@ $scrips.map! {|s| [s[0], s[1..-1].map {|w| $pd[w]}.join(' ')]}
 # ["IL9_SetE_046_041", "dh ey m ey d f ah n ah ..."].
 
 # Convert each phone string into a word string, using a trie as in PTgen/steps/phone2word.rb.
-Prondict = 'kinyar-lexicon.txt' # From a non-trie kinyar's local/dict/lexicon.txt.
+Prondict = 'sinhal-lexicon.txt' # From a non-trie sinhal's local/dict/lexicon.txt.
 require "trie" # gem install fast_trie (On ifp-53, append --user-install.)
 trie = Trie.new
 h =  Hash.new {|h,k| h[k] = []} # A hash mapping each pronunciation to an array of homonym words.
 i = 0
 
 # Restrict phones.  Map rare ones to common ones.  Map into the prondict.
-# Map vowels to ah, eh, uw.
-$remap = Hash[ 'aw','ah', 's','ch', 'sh','ch', 'jh','ch', 'iy','eh',
-  'dh','t', 'er','eh', 'ae','ah', 'ao','ah', 'b','p',
-  'ih','eh', 'uh','ah', 'aa','ah', 'ay','ah', 'ow','uw', 'ey','ah'
+$remap = Hash[ 
+  'ae','ey', 'ay','ey', 'ao','uh', 'ah','aa',
+  'ch','jh', 'b','p', 'ng','m'
 ]
 def soft(ph) r = $remap[ph]; r ? r : ph; end
 
@@ -44,8 +43,7 @@ begin
   pd.map! {|l| l.split("\t") }
   pd.map! {|w,pron| [w.strip, pron.strip]}
   pd.uniq!
-  # Cull words chosen too often: short, vowelless, or consonantless.
-  pd.delete_if {|w,pron| w.size<3 || w !~ /[aeiou]/ || w =~ /^[aeiou]+$/}
+  # If we cull length-1 words, almost no words remain.  So instead soft-match aggressively.
   # Soft-match like Soundex.
   pd.map! {|w,pron| [w, pron.split(" ").map{|ph| soft(ph)}.join(" ")]}
   # Deduplicate phones.
