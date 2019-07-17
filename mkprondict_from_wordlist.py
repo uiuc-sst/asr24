@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys, os, re
+from pprint import pprint
 
 USAGE='''USAGE: mkprondict_from_wordlist.py <newlangdir>.  Make prondict from input wordlist, which is assumed to already match the language model.'''
 if len(sys.argv) != 2:
@@ -29,10 +30,20 @@ with open(fileIndict, 'r', encoding='utf-8') as f:
     for line in f:
         words = line.rstrip().split()
         if len(words) > 1:
-            n = len(words[0]) - 1
+            w = words[0]
+            n = len(w) - 1
+            # Some troublesome graphemes (dotted circle diacritics) are only pasteable
+            # into a g2p when surrounded by double quotes.  Parse those here.
+	    # But this fails: it STILL complains "has g2p-missing grapheme."
+            #if n >= 2 and w[0]=='"' and w[n]=='"':
+            #    w = w[1:n]
+            #    print("Detroubled!\n")
+            #    pprint(w)
+            #    pprint(len(w))
+            #    print("Detroubled!\n")
             while n >= len(g2p):
                 g2p.append({})
-            g2p[n][words[0].upper()] = ' '.join(words[1:])
+            g2p[n][w.upper()] = ' '.join(words[1:])
             for p in words[1:]:
                 phoneset[p] = 1
 
@@ -80,12 +91,19 @@ with open(fileInwords, 'r', encoding='utf-8') as f:
                     # No prefix matched, so the character word[0] was missing from the g2p.
                     print('Wordlist ' + fileInwords + ' has g2p-missing grapheme "' + word[0].lower() + '" in word "' + wordOriginal + '"')
                     #print(word[0].lower())
-                    ok = False
-                    # If the grapheme is really obscure, in a loanword, such as Ḥ of alḤasan in the context of Kinyarwanda,
-                    # then correct the grapheme in the supposedly clean wordlist,
-                    # instead of growing the g2p or extending this source code.
+                    if True:
+                        # Hack: append this to the g2p as a nil phoneme.
+                        # This grows the g2p, // but the appended entries aren't found by later words!  So just silently ignore the missing g's.  Sigh.
+                        if True:
+                            print('Adding nil g2p rule for ' +  word[0].lower() + '.')
+                            g2p[len(word[0])-1][word[0].upper()] = 'sil'
+                    else:
+                        ok = False
+                        # If the grapheme is really obscure, in a loanword, such as Ḥ of alḤasan in the context of Kinyarwanda,
+                        # then correct the grapheme in the supposedly clean wordlist,
+                        # instead of growing the g2p or extending this source code.
                     word = ""
-                    rec = [] # Just remove this word from the g2p.
+                    rec = [] # Just remove this word from the prondict.
                     break
                 prefix = word[0:n]
                 prefixM = wordM[0:n]
