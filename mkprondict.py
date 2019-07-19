@@ -82,8 +82,9 @@ with open(fileIntxt, 'r', encoding='utf-8') as f:
             for wordM in re.split('[\d\s]+', line.strip()):
                 if not wordM:
                     continue
+                wordM = wordM.lower()   # this line disables mixed case.
                 word = wordM.upper()
-                if word == '<UNK>' or word == '</S>' or word == '<S>':
+                if word == '<UNK>' or word == '</S>' or word == '<S>' or word == '.' or word == '?':
                     continue
                 if wordM in prondict:
                     # This word already appeared in fileIntxt.
