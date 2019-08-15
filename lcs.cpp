@@ -71,47 +71,64 @@ vector<string> strsFromFile(const char* filename) {
 }
 
 // trim from start (in place)
-static inline void ltrim(std::string &s) {
-  s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) { return !std::isspace(ch); }));
+static inline void ltrim(string &s) {
+  s.erase(s.begin(), find_if(s.begin(), s.end(), [](int ch) { return !isspace(ch); }));
 }
 // trim from end (in place)
-static inline void rtrim(std::string &s) {
-  s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) { return !std::isspace(ch); }).base(), s.end());
+static inline void rtrim(string &s) {
+  s.erase(find_if(s.rbegin(), s.rend(), [](int ch) { return !isspace(ch); }).base(), s.end());
 }
 // trim from both ends (in place)
-static inline void trim(std::string &s) {
+static inline void trim(string &s) {
   ltrim(s);
   rtrim(s);
 }
 
-#if 0
-#include <unicode/unistr.h>
-#include <unicode/ustream.h>
-#include <unicode/locid.h>
-#include <iostream>
-// Converting to lowercase via icu::UnicodeString::toLower("de_DE")
-// is a fool's errand, because it needs conversion to Embarcadero's AnsiString
-// and thence to std::string or char*.  Dependency hell.
-#endif
-
-map<string, string> pronsFromFile(const char* filename, char delimiter = '\t') {
+map<string, string> pronsFromFile(const char* filename, char delimiter = '\t', bool fCull = false) {
   map<string, string> m;
   istringstream ss(strFromFile(filename));
   string line;
   while (getline(ss, line, '\n')) {
     // Convert to lower case.  May crash for non-ASCII multibyte UTF8.
     transform(line.begin(), line.end(), line.begin(), [](unsigned char c){ return tolower(c); });
-    // Omit words that begin with a nonletter.
-    const auto firstchar = line[0];
-    if (firstchar < 'a' || firstchar > 'z')
-      continue;
+    {
+      // Omit words that begin with a nonletter.
+      const auto firstchar = line[0];
+      if (firstchar < 'a' || firstchar > 'z')
+	continue;
+    }
     // Split at delimiter into word and pronunciation.
     string word, pron;
-    istringstream iss(line);
-    getline(iss, word, delimiter);
-    getline(iss, pron); // omit delimiter?
-    //cout << word << "\t\t---\t\t" << pron << "\n";;;;
-    trim(pron);
+    {
+      istringstream iss(line);
+      getline(iss, word, delimiter);
+      getline(iss, pron); // omit delimiter?
+      //cout << word << "\t\t---\t\t" << pron << "\n";;;;
+      trim(pron);
+    }
+    if (fCull) {
+      // Omit words chosen too often by LCS: short, vowelless, or consonantless.
+      if (word.size() < 3 ||
+	  word.find_first_of("aeiou") == string::npos ||
+	  word.find_first_of("bcdfghjklmnpqrstvwxyz") == string::npos)
+	continue;
+      // todo: Soft-match like Soundex.
+      ;;;;
+    }
+    // Deduplicate phones: split at spaces, then accumulate only nonduplicates.
+    {
+      istringstream iss(pron);
+      string phonesNew, phonePrev;
+      string phone;
+      while (getline(iss, phone, ' ')) {
+	if (phonePrev.empty() || phone != phonePrev)
+	  phonesNew += phone + ' ';
+	phonePrev = phone;
+      }
+      rtrim(phonesNew);
+      pron = phonesNew;
+    }
+
     m[word] = pron;
   }
   //;;;; tidy, cull, uniq, like lcs-kinyar.rb:72-92.
@@ -147,7 +164,7 @@ bool onlySingleLettersLeft(const string& s) {
 }
 
 int main() {
-  const auto prondict(pronsFromFile("lcs1/train_all/cmudict-plain.txt"));
+  const auto prondict(pronsFromFile("lcs1/train_all/cmudict-plain.txt", '\t'));
   cout << "Read prondict.\n";
 
   // Read transcriptions made of nonsense English words.
@@ -167,7 +184,7 @@ int main() {
   }
   cout << "Pronounced scrips.\n";
 
-  const auto prondictKinyar(pronsFromFile("kinyar-lexicon.txt", ' '));
+  const auto prondictKinyar(pronsFromFile("kinyar-lexicon.txt", ' ', true));
   // abantu, aa b aa n t uw
 
   // To optimize, cull prondictKinyar.
@@ -260,12 +277,6 @@ int main() {
   if (0) {
     const string s1("t o n z ɛ t ɪ n d ə t ɑ x t ə ɣ ə r j aː r ə m ɛ t m eː ɣ aː ɦ ɪ t s ɑ l s d ə b ɔ m d o r ə s d eː ɛ n ɪ s d");
     const string s2("avondetappe     ɑ v ɔ n d ə t ɑ p ə");
-    const auto r = lcs(s1, s2);
-    cout << "The LCS of '" << s1 << "'\nand '" << s2 << "'\nis '" << s1.substr(r[1], r[0]) << "', of " << r.size()-1 << " total.\n";
-  }
-  if (0) {
-    const string s1("AH D AH M AH T");
-    const auto s2(strsFromFile("lcs1/train_all/cmudict-plain.txt")[990]);
     const auto r = lcs(s1, s2);
     cout << "The LCS of '" << s1 << "'\nand '" << s2 << "'\nis '" << s1.substr(r[1], r[0]) << "', of " << r.size()-1 << " total.\n";
   }
