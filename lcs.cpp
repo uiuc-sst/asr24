@@ -163,6 +163,63 @@ bool onlySingleLettersLeft(const string& s) {
   return true;
 }
 
+// Levenshtein Distance Algorithm: C++ Implementation
+// by Anders Sewerin Johansen, http://www.merriampark.com/ldcpp.htm, https://github.com/ekg/ogap
+int levenshtein(const std::string source, const std::string target) {
+  const int n = source.length();
+  const int m = target.length();
+  if (n == 0) {
+    return m;
+  }
+  if (m == 0) {
+    return n;
+  }
+  typedef std::vector< std::vector<int> > Tmatrix; 
+  Tmatrix matrix(n+1);
+
+  // Size the vectors in the 2.nd dimension. Unfortunately C++ doesn't
+  // allow for allocation on declaration of 2.nd dimension of vec of vec
+  for (int i = 0; i <= n; i++) {
+    matrix[i].resize(m+1);
+  }
+  for (int i = 0; i <= n; i++) {
+    matrix[i][0]=i;
+  }
+  for (int j = 0; j <= m; j++) {
+    matrix[0][j]=j;
+  }
+  for (int i = 1; i <= n; i++) {
+    const char s_i = source[i-1];
+    for (int j = 1; j <= m; j++) {
+      const char t_j = target[j-1];
+      int cost;
+      if (s_i == t_j) {
+        cost = 0;
+      }
+      else {
+        cost = 1;
+      }
+      const int above = matrix[i-1][j];
+      const int left = matrix[i][j-1];
+      const int diag = matrix[i-1][j-1];
+      int cell = min( above + 1, min(left + 1, diag + cost));
+      // Cover transposition, in addition to deletion,
+      // insertion and substitution. This step is taken from:
+      // Berghel, Hal ; Roach, David : "An Extension of Ukkonen's 
+      // Enhanced Dynamic Programming ASM Algorithm"
+      // (http://www.acm.org/~hlb/publications/asm/asm.html)
+      if (i>2 && j>2) {
+        int trans=matrix[i-2][j-2]+1;
+        if (source[i-2]!=t_j) trans++;
+        if (s_i!=target[j-2]) trans++;
+        if (cell>trans) cell=trans;
+      }
+      matrix[i][j]=cell;
+    }
+  }
+  return matrix[n][m];
+}
+
 int main() {
   const auto prondict(pronsFromFile("lcs1/train_all/cmudict-plain.txt", '\t'));
   cout << "Read prondict.\n";
@@ -172,7 +229,7 @@ int main() {
   cout << "Read scrips.\n";
 
   // Apply pronunciations to each scrip, i.e. to "cougar aortic thrown" after NI1-2018-07-02_01_051.
-  vector<pair<string,string> > scripsPron;
+  vector<pair<string, string> > scripsPron;
   for (auto scrip: scrips) {
     const string uttid(scrip[0]);
     scrip.erase(scrip.begin()); // Remove uttid.
@@ -223,7 +280,7 @@ int main() {
       string vbest;
       string vword;
       auto lenBest = 0;
-      vector<pair< vector<string>, string>> bests;
+      vector<pair< vector<string>, string>> bests; // Longest matches of phone strings.
       cout << "\nscanning prondict...\n";
       for (auto& kv: prondictKinyar) {
 	const auto& word = kv.first;
@@ -244,22 +301,51 @@ int main() {
 	  bests.emplace_back(substrs, word);
 	}
       }
-      //cout << "scanned.\n";
+      cout << "scanned.\n";
       // lcs-kinyar.rb line 197
-      string closest, closestphonestring;
-      for (auto& ab: bests) {
-	const auto& substr = ab.first;
+      typedef tuple<int, string, string> Close;
+      vector<Close> closests;
+      vector<Close> foo;
+      //cout << "Bests are: "; for (const auto& ab: bests) { const auto& word = ab.second; cout << word << " "; } cout << "\n";
+      for (const auto& ab: bests) {
+	const auto& substrs = ab.first;
 	const auto& word = ab.second;
-	closest = word;
-	closestphonestring = *substr.begin();
-	//cout << "Grabbing first not closest: " << closest << " = " << closestphonestring << "\n";;;; // instead use vbest,vword.
-	break;;;;
+	//cout << "Finding closests for " << word << " -- " << lookup[word] << "\n";
+	int dMin = 9999;
+	for (auto& s: substrs) {
+	  const auto d = levenshtein(lookup[word], s);
+	  //cout << d << " -- " << s << "\n";
+	  if (d < dMin) {
+	    dMin = d;
+	    closests.clear();
+	  }
+	  if (d <= dMin)
+	    closests.emplace_back(d, word, s);
+	}
+	closests.erase(unique(closests.begin(), closests.end()), closests.end()); // remove duplicates
+	//cout << "Closests are:\n"; for (auto c: closests) cout << get<0>(c) << " -- " << get<1>(c) << ", " << get<2>(c) << "\n";
+	/*
+	// Not needed, because closests[*] has all the same d.
+	closests.erase(remove_if(closests.begin(), closests.end(),
+	  [&dMin](const Close& c) { return get<0>(c) == dMin; }), closests.end()); // Needed?
+	*/
+
+	// Choose one of these, randomly.
+	// std::uniform_int_distribution would be overkill.
+	// RAND_MAX is big enough to avoid sampling bias: typically, size() < 10.
+	const auto i = rand() % closests.size();
+	foo.emplace_back(closests[i]);
+	//if (closests.size() > 1) cout << "Chose # " << i << "\n";
       }
-      const auto chosenWord = closest;
-      const auto chosenPhonestring = closestphonestring;
+      // Choose the member of foo with the smallest Levenshtein distance.
+      const auto& bestOverall = *min_element(foo.begin(), foo.end(),
+	  [](const Close& lhs, const Close& rhs) { return get<0>(lhs) < get<0>(rhs); });
+      const auto chosenWord = get<1>(bestOverall);
+      const auto chosenPhonestring = get<2>(bestOverall);
+      cout << "chose d = " << get<0>(bestOverall) << ", " << chosenWord << "\n";
       // Re-find its phone string in phones.
       const auto i = phones.find(chosenPhonestring);
-      //cout << "Mark from " << i << " to " << i+chosenPhonestring.size() << "\n";
+      //cout << "Mark as used the phones from " << i << " to " << i+chosenPhonestring.size() << "\n";
       acc.emplace_back(i, chosenWord);
       for (auto j = i; j < i+chosenPhonestring.size(); ++j)
 	phones[j] = '_';
