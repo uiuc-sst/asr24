@@ -165,44 +165,28 @@ bool onlySingleLettersLeft(const string& s) {
 
 // Levenshtein Distance Algorithm: C++ Implementation
 // by Anders Sewerin Johansen, http://www.merriampark.com/ldcpp.htm, https://github.com/ekg/ogap
-int levenshtein(const std::string source, const std::string target) {
+int levenshtein(const string& source, const string& target) {
   const int n = source.length();
   const int m = target.length();
-  if (n == 0) {
-    return m;
-  }
-  if (m == 0) {
-    return n;
-  }
-  typedef std::vector< std::vector<int> > Tmatrix; 
+  if (n == 0) return m;
+  if (m == 0) return n;
+  typedef vector<vector<int>> Tmatrix; 
   Tmatrix matrix(n+1);
 
   // Size the vectors in the 2.nd dimension. Unfortunately C++ doesn't
   // allow for allocation on declaration of 2.nd dimension of vec of vec
-  for (int i = 0; i <= n; i++) {
-    matrix[i].resize(m+1);
-  }
-  for (int i = 0; i <= n; i++) {
-    matrix[i][0]=i;
-  }
-  for (int j = 0; j <= m; j++) {
-    matrix[0][j]=j;
-  }
+  for (int i = 0; i <= n; i++) matrix[i].resize(m+1);
+  for (int i = 0; i <= n; i++) matrix[i][0]=i;
+  for (int j = 0; j <= m; j++) matrix[0][j]=j;
   for (int i = 1; i <= n; i++) {
-    const char s_i = source[i-1];
+    const char& s_i = source[i-1];
     for (int j = 1; j <= m; j++) {
-      const char t_j = target[j-1];
-      int cost;
-      if (s_i == t_j) {
-        cost = 0;
-      }
-      else {
-        cost = 1;
-      }
+      const char& t_j = target[j-1];
+      const int cost = s_i == t_j ? 0 : 1;
       const int above = matrix[i-1][j];
       const int left = matrix[i][j-1];
       const int diag = matrix[i-1][j-1];
-      int cell = min( above + 1, min(left + 1, diag + cost));
+      int cell = min(above + 1, min(left + 1, diag + cost));
       // Cover transposition, in addition to deletion,
       // insertion and substitution. This step is taken from:
       // Berghel, Hal ; Roach, David : "An Extension of Ukkonen's 
