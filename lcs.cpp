@@ -16,17 +16,17 @@ using namespace std;
 // Later, for speed: to avoid mallocs,
 // replace std::string with char[50] if that's long enough for all substrings.
 
-// Longest common substring algorithm, via dynamic programming.
+// Longest Common Substring algorithm, via dynamic programming.
+// Return the length of the substrings, followed by their offsets into "a."
 // But accumulate only substrings at least as long as lBest,
 // because those are the only ones that the caller would keep.
 vector<int> lcs(const string& a, const string& b, const int lBest=0) {
   const auto ca = a.size();
   const auto cb = b.size();
   int l[ca][cb]; // Lengths of substrings.
-  memset(l, 0, sizeof(l));
+  memset(l, 0, sizeof l);
   int lMax = 0;  // Max so far of l[][]'s.
   vector<int> iBests; // Longest substrings so far, of length lMax, as offsets into "a".
-  //cout << "ca cb = " << ca << " " << cb << "\n";
   for (auto ia=0u; ia<ca; ++ia)
   for (auto ib=0u; ib<cb; ++ib) {
     if (a[ia] != b[ib])
@@ -47,8 +47,7 @@ vector<int> lcs(const string& a, const string& b, const int lBest=0) {
 	iBests.push_back(iNew);
     }
   }
-  iBests.insert(iBests.begin(), lMax); // Prepend the substrings' length to the array of offsets into a.
-  //cout << "iBests "; for (auto i: iBests) cout << i << " "; cout << "\n";
+  iBests.insert(iBests.begin(), lMax); // Prepend the substrings' length to the vector of offsets into a.
   return iBests;
 }
 
@@ -295,7 +294,7 @@ int main() {
       // lcs-kinyar.rb line 197
       typedef tuple<int, string, string> Close;
       vector<Close> closests;
-      vector<Close> foo;
+      vector<Close> candidates;
       //cout << "Bests are: "; for (const auto& ab: bests) { const auto& word = ab.second; cout << word << " "; } cout << "\n";
       for (const auto& ab: bests) {
 	const auto& substrs = ab.first;
@@ -304,7 +303,6 @@ int main() {
 	int dMin = 9999;
 	for (auto& s: substrs) {
 	  const auto d = levenshtein(lookup[word], s);
-	  //cout << d << " -- " << s << "\n";
 	  if (d < dMin) {
 	    dMin = d;
 	    closests.clear();
@@ -314,25 +312,18 @@ int main() {
 	}
 	closests.erase(unique(closests.begin(), closests.end()), closests.end()); // remove duplicates
 	//cout << "Closests are:\n"; for (auto c: closests) cout << get<0>(c) << " -- " << get<1>(c) << ", " << get<2>(c) << "\n";
-	/*
-	// Not needed, because closests[*] has all the same d.
-	closests.erase(remove_if(closests.begin(), closests.end(),
-	  [&dMin](const Close& c) { return get<0>(c) == dMin; }), closests.end()); // Needed?
-	*/
 
 	// Choose one of these, randomly.
 	// std::uniform_int_distribution would be overkill.
 	// RAND_MAX is big enough to avoid sampling bias: typically, size() < 10.
-	const auto i = rand() % closests.size();
-	foo.emplace_back(closests[i]);
-	//if (closests.size() > 1) cout << "Chose # " << i << "\n";
+	candidates.emplace_back(closests[rand() % closests.size()]);
       }
-      // Choose the member of foo with the smallest Levenshtein distance.
-      const auto& bestOverall = *min_element(foo.begin(), foo.end(),
-	  [](const Close& lhs, const Close& rhs) { return get<0>(lhs) < get<0>(rhs); });
-      const auto chosenWord = get<1>(bestOverall);
-      const auto chosenPhonestring = get<2>(bestOverall);
-      cout << "chose d = " << get<0>(bestOverall) << ", " << chosenWord << "\n";
+      // Choose the candidate with the smallest Levenshtein distance.
+      const auto& bestOverall = *min_element(candidates.begin(), candidates.end(),
+	[](const Close& lhs, const Close& rhs) { return get<0>(lhs) < get<0>(rhs); });
+      const auto& chosenWord = get<1>(bestOverall);
+      const auto& chosenPhonestring = get<2>(bestOverall);
+      cout << "Chose d = " << get<0>(bestOverall) << ", " << chosenWord << "\n";
       // Re-find its phone string in phones.
       const auto i = phones.find(chosenPhonestring);
       acc.emplace_back(i, chosenWord);
