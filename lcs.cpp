@@ -163,39 +163,51 @@ bool onlySingleLettersLeft(const string& s) {
   return true;
 }
 
-// Levenshtein Distance Algorithm: C++ Implementation
-// by Anders Sewerin Johansen, http://www.merriampark.com/ldcpp.htm, https://github.com/ekg/ogap
-int levenshtein(const string& source, const string& target) {
-  const int n = source.length();
-  const int m = target.length();
+// Levenshtein distance
+int levenshtein(const string& si, const string& sj) {
+  const int n = si.length();
+  const int m = sj.length();
   if (n == 0) return m;
   if (m == 0) return n;
   vector<vector<int>> M(n+1, vector<int>(m+1));
   for (int i = 0; i <= n; i++) M[i][0]=i;
   for (int j = 0; j <= m; j++) M[0][j]=j;
   for (int i = 1; i <= n; i++) {
-    const char& s_i = source[i-1];
+    const char s_i = si[i-1];
     for (int j = 1; j <= m; j++) {
-      const char& t_j = target[j-1];
+      const char t_j = sj[j-1];
       const int cost = s_i == t_j ? 0 : 1;
       const int& above = M[i-1][j];
       const int& left  = M[i][j-1];
       const int& diag  = M[i-1][j-1];
       int cell = min(above + 1, min(left + 1, diag + cost));
-      // Cover transposition, as well as deletion, insertion and substitution.
-      // From Berghel & Roach, "An Extension of Ukkonen's Enhanced Dynamic Programming ASM Algorithm,"
-      // www.acm.org/~hlb/publications/asm/asm.html
+      // Exclude transposition, because although it's easy for typed letter,
+      // it's rare for spoken phones.
+#if 0
+      // Include transposition, as well as deletion, insertion and substitution.
+      // From Berghel & Roach, "An Extension of Ukkonen's Enhanced Dynamic Programming ASM Algorithm."
       if (i>2 && j>2) {
         int trans = M[i-2][j-2] + 1;
-        if (source[i-2] != t_j) ++trans;
-        if (s_i != target[j-2]) ++trans;
-        if (cell>trans)
-	  cell=trans;
+        if (si[i-2] != t_j) ++trans;
+        if (s_i != sj[j-2]) ++trans;
+        if (cell > trans)
+	  cell = trans;
       }
-      M[i][j]=cell;
+#endif
+      M[i][j] = cell;
     }
   }
   return M[n][m];
+}
+
+void replaceAllInstances(string& s, const string& sOld, const string& sNew) {
+  const auto cOld = sOld.length();
+  const auto cNew = sNew.length();
+  size_t i = 0u;
+  while ((i = s.find(sOld, i)) != string::npos) {
+     s.replace(i, cOld, sNew);
+     i += cNew;
+  }
 }
 
 int main() {
@@ -239,7 +251,7 @@ int main() {
   }
   cout << "Prondict had " << prondictKinyar.size() << " pronunciations.\n";
   // Now lookup has all the pronunciations, and h has all the homonyms.
-  // ;;;; Use lookup.  Use h.
+  // ;;;; Use h.
 
   for (auto scrip: scripsPron) {
     const auto& uttid(scrip.first);
@@ -259,7 +271,7 @@ int main() {
       string vword;
       auto lenBest = 0;
       vector<pair< vector<string>, string>> bests; // Longest matches of phone strings.
-      cout << "\nscanning prondict...\n";
+      //cout << "\nscanning prondict...\n";
       for (auto& kv: prondictKinyar) {
 	const auto& word = kv.first;
 	const auto& pron = kv.second;
@@ -273,13 +285,13 @@ int main() {
 	if (len > lenBest) {
 	  lenBest = len;
 	  bests = {{substrs, word}};
-	  cout << "best " << lenBest << ", " << word << " , " << pron << "\n";
+	  //cout << "best " << lenBest << ", " << word << " , " << pron << "\n";
 	}
 	else if (len == lenBest) {
 	  bests.emplace_back(substrs, word);
 	}
       }
-      cout << "scanned.\n";
+      //cout << "scanned.\n";
       // lcs-kinyar.rb line 197
       typedef tuple<int, string, string> Close;
       vector<Close> closests;
@@ -323,10 +335,15 @@ int main() {
       cout << "chose d = " << get<0>(bestOverall) << ", " << chosenWord << "\n";
       // Re-find its phone string in phones.
       const auto i = phones.find(chosenPhonestring);
-      //cout << "Mark as used the phones from " << i << " to " << i+chosenPhonestring.size() << "\n";
       acc.emplace_back(i, chosenWord);
-      for (auto j = i; j < i+chosenPhonestring.size(); ++j)
-	phones[j] = '_';
+      // Replace the used phones, from i to i+chosenPhonestring.size(),
+      // with a single _ rather than a sequence of _'s,
+      // so later lcs()'s have shorter inputs and are thus faster.
+      phones[i] = '_';
+      phones.erase(i+1, chosenPhonestring.size()-1);
+      // Even faster: coalesce consecutive _'s from previous replacements.  __ to _ suffices.
+      // Splitting phones into separate strings and lcs'ing each one would be doubtfully faster yet.
+      replaceAllInstances(phones, "__", "_");
     }
     cout << "Only isolated single letters left.\n";
 
