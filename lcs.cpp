@@ -83,6 +83,64 @@ static inline void trim(string &s) {
   rtrim(s);
 }
 
+// Restrict phones.  Map rare ones to common ones.  Map into the prondict.
+// Map vowels to ah, eh, uw.
+void soft(string& phone) {
+  static const map<string, string> soundex = {
+    {"aw", "ah"},
+    {"s", "ch"},
+    {"sh", "ch"},
+    {"jh", "ch"},
+    {"iy", "eh"},
+    {"dh", "t"},
+    {"er", "eh"},
+    {"ae", "ah"},
+    {"ao", "ah"},
+    {"b", "p"},
+    {"ih", "eh"},
+    {"uh", "ah"},
+    {"aa", "ah"},
+    {"ay", "ah"},
+    {"ow", "uw"},
+    {"ey", "ah"}
+  };
+  const auto it = soundex.find(phone);
+  if (it != soundex.end())
+    phone = it->second;
+}
+
+// Remap a phone to a single char (in prondict and scrips) to avoid matching only part of a multichar phone like 'ao'.
+void remap(string& phone) {
+  static const map<string, string> tidy = {
+    {"ah", "0"},
+    {"ch", "1"},
+    {"d",  "2"},
+    {"eh", "3"},
+    {"f",  "4"},
+    {"g",  "5"},
+    {"hh", "6"},
+    {"k",  "7"},
+    {"l",  "8"},
+    {"m",  "9"},
+    {"n",  "a"},
+    {"ng", "b"},
+    {"p",  "c"},
+    {"sil","d"},
+    {"t",  "e"},
+    {"th", "f"},
+    {"uw", "g"},
+    {"v",  "h"},
+    {"w",  "i"},
+    {"y",  "j"},
+    {"z",  "k"},
+    {"r",  "l"},
+    {" ",  ""}
+  };
+  const auto it = tidy.find(phone);
+  if (it != tidy.end())
+    phone = it->second;
+}
+
 map<string, string> pronsFromFile(const char* filename, char delimiter = '\t', bool fCull = false) {
   map<string, string> m;
   istringstream ss(strFromFile(filename));
@@ -102,7 +160,7 @@ map<string, string> pronsFromFile(const char* filename, char delimiter = '\t', b
       istringstream iss(line);
       getline(iss, word, delimiter);
       getline(iss, pron); // omit delimiter?
-      //cout << word << "\t\t---\t\t" << pron << "\n";;;;
+      //if (!fCull) cout << word << "\t\t---\t\t" << pron << "\n";;;;
       trim(pron);
     }
     if (fCull) {
@@ -111,8 +169,6 @@ map<string, string> pronsFromFile(const char* filename, char delimiter = '\t', b
 	  word.find_first_of("aeiou") == string::npos ||
 	  word.find_first_of("bcdfghjklmnpqrstvwxyz") == string::npos)
 	continue;
-      // todo: Soft-match like Soundex.
-      ;;;;
     }
     // Deduplicate phones: split at spaces, then accumulate only nonduplicates.
     {
@@ -120,14 +176,17 @@ map<string, string> pronsFromFile(const char* filename, char delimiter = '\t', b
       string phonesNew, phonePrev;
       string phone;
       while (getline(iss, phone, ' ')) {
+	soft(phone);
+	remap(phone);
+	trim(phone);
 	if (phonePrev.empty() || phone != phonePrev)
-	  phonesNew += phone + ' ';
+	  phonesNew += phone; //+' ';
 	phonePrev = phone;
       }
       rtrim(phonesNew);
       pron = phonesNew;
+      //if (!fCull) cout << "\t\t\t\t'" << pron << "'\n";
     }
-
     m[word] = pron;
   }
   //;;;; tidy, cull, uniq, like lcs-kinyar.rb:72-92.
@@ -226,7 +285,7 @@ int main() {
     scrip.erase(scrip.begin()); // Remove uttid.
     string phones;
     for (auto word: scrip)
-      phones += prondict.at(word) + ' '; // .at() handles const map, unlike [].
+      phones += prondict.at(word); //+' '; // .at() handles const map, unlike [].
     trim(phones);
     scripsPron.emplace_back(uttid, phones);
   }
@@ -236,8 +295,6 @@ int main() {
   // abantu, aa b aa n t uw
 
   // To optimize, cull prondictKinyar.
-
-  // Remap phones to single chars (in prondict and scrips) to avoid matching only part of a multichar phone like 'ao'.\n"; exit(1);
 
   typedef vector<string> MySet;
   unordered_map<string, MySet> h; // Map each pron to a collection of homonym words.
