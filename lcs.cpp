@@ -169,24 +169,24 @@ int levenshtein(const string& si, const string& sj) {
   if (n == 0) return m;
   if (m == 0) return n;
   vector<vector<int>> M(n+1, vector<int>(m+1));
-  for (int i = 0; i <= n; i++) M[i][0]=i;
-  for (int j = 0; j <= m; j++) M[0][j]=j;
-  for (int i = 1; i <= n; i++) {
-    const char s_i = si[i-1];
+  for (auto i = 0; i <= n; i++) M[i][0]=i;
+  for (auto j = 0; j <= m; j++) M[0][j]=j;
+  for (auto i = 1; i <= n; i++) {
+    const auto s_i = si[i-1];
     for (int j = 1; j <= m; j++) {
-      const char t_j = sj[j-1];
-      const int cost = s_i == t_j ? 0 : 1;
-      const int& above = M[i-1][j];
-      const int& left  = M[i][j-1];
-      const int& diag  = M[i-1][j-1];
-      int cell = min(above + 1, min(left + 1, diag + cost));
-      // Exclude transposition, because although it's easy for typed letter,
+      const auto t_j = sj[j-1];
+      const auto cost = s_i == t_j ? 0 : 1;
+      const auto& above = M[i-1][j];
+      const auto& left  = M[i][j-1];
+      const auto& diag  = M[i-1][j-1];
+      const auto cell = min(above + 1, min(left + 1, diag + cost));
+      // Exclude transposition, because although it's easy for typed letters,
       // it's rare for spoken phones.
 #if 0
       // Include transposition, as well as deletion, insertion and substitution.
       // From Berghel & Roach, "An Extension of Ukkonen's Enhanced Dynamic Programming ASM Algorithm."
       if (i>2 && j>2) {
-        int trans = M[i-2][j-2] + 1;
+        auto trans = M[i-2][j-2] + 1;
         if (si[i-2] != t_j) ++trans;
         if (s_i != sj[j-2]) ++trans;
         if (cell > trans)
