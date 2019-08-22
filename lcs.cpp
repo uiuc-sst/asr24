@@ -252,7 +252,15 @@ int main() {
   }
   cout << "Prondict had " << prondictKinyar.size() << " pronunciations.\n";
   // Now lookup has all the pronunciations, and h has all the homonyms.
-  // ;;;; Use h.
+
+#if 0
+  // Dump the homonyms.
+  for (const auto& kv: h) {
+    cout << kv.first << "\t\t\t";
+    for (const auto& word: kv.second) cout << word << " ";
+    cout << "\n";
+  }
+#endif
 
   for (auto scrip: scripsPron) {
     const auto& uttid(scrip.first);
@@ -302,7 +310,7 @@ int main() {
 	const auto& substrs = ab.first;
 	const auto& word = ab.second;
 	//cout << "Finding closests for " << word << " -- " << lookup[word] << "\n";
-	int dMin = 9999;
+	auto dMin = 9999;
 	for (auto& s: substrs) {
 	  const auto d = levenshtein(lookup[word], s);
 	  if (d < dMin) {
@@ -327,8 +335,15 @@ int main() {
       const auto& chosenPhonestring = get<2>(bestOverall);
       cout << "Chose d = " << get<0>(bestOverall) << ", " << chosenWord << "\n";
       // Re-find its phone string in phones.
-      const auto i = phones.find(chosenPhonestring);
-      acc.emplace_back(i, chosenWord);
+      const auto iPhone = phones.find(chosenPhonestring);
+      // Usually, chosenPhonestring won't be in h[], because it's usually a
+      // proper subset of the pronunciation of some words, not the exact
+      // pronunciation of any particular words.
+      // Instead of a fancier lookup, for the common case just use chosenWord.
+      // It's often enough the best choice, anyways.
+      const auto& homonyms = h[chosenPhonestring];
+      const auto& homonym = homonyms.empty() ? chosenWord : homonyms[rand() % homonyms.size()];
+      acc.emplace_back(iPhone, homonym);
 #if 0
       // Replace the used phones, from i to i+chosenPhonestring.size(),
       // with a single _ rather than a sequence of _'s,
@@ -341,7 +356,7 @@ int main() {
 #else
       // Mark each used phone.  Slower, but less overhead than mapping the offset in a shrunken phones[]
       // to the offset in the original.  That offset is what we sort acc by, to reconstruct the order of words.
-      for (auto j = i; j < i+chosenPhonestring.size(); ++j)
+      for (auto j = iPhone; j < iPhone+chosenPhonestring.size(); ++j)
 	phones[j] = '_';
 #endif
     }
