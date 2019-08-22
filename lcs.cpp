@@ -199,6 +199,7 @@ int levenshtein(const string& si, const string& sj) {
   return M[n][m];
 }
 
+#if 0
 void replaceAllInstances(string& s, const string& sOld, const string& sNew) {
   const auto cOld = sOld.length();
   const auto cNew = sNew.length();
@@ -208,6 +209,7 @@ void replaceAllInstances(string& s, const string& sOld, const string& sNew) {
      i += cNew;
   }
 }
+#endif
 
 int main() {
   const auto prondict(pronsFromFile("lcs1/train_all/cmudict-plain.txt", '\t'));
@@ -327,6 +329,7 @@ int main() {
       // Re-find its phone string in phones.
       const auto i = phones.find(chosenPhonestring);
       acc.emplace_back(i, chosenWord);
+#if 0
       // Replace the used phones, from i to i+chosenPhonestring.size(),
       // with a single _ rather than a sequence of _'s,
       // so later lcs()'s have shorter inputs and are thus faster.
@@ -335,6 +338,12 @@ int main() {
       // Even faster: coalesce consecutive _'s from previous replacements.  __ to _ suffices.
       // Splitting phones into separate strings and lcs'ing each one would be doubtfully faster yet.
       replaceAllInstances(phones, "__", "_");
+#else
+      // Mark each used phone.  Slower, but less overhead than mapping the offset in a shrunken phones[]
+      // to the offset in the original.  That offset is what we sort acc by, to reconstruct the order of words.
+      for (auto j = i; j < i+chosenPhonestring.size(); ++j)
+	phones[j] = '_';
+#endif
     }
     cout << "Only isolated single letters left.\n";
 
