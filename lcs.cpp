@@ -211,7 +211,7 @@ vector<vector<string> > strsFromSTDIN() {
 // Does this string match the regex /[^_][^_]/ ?
 // Hand-coded, because std::regex requires gcc 4.9, which is too new for Ubuntu 14.04.5.
 // So find "not a _" and another one right thereafter.
-bool onlySingleLettersLeft(const string& s) {
+bool noContiguousPhonesLeft(const string& s) {
   const auto n = s.size();
   if (n < 2)
     return true;
@@ -331,10 +331,8 @@ int main() {
     typedef pair<int, string> AccPair;
     vector<AccPair> acc;
     // Keep matching words until phones has only isolated single letters left.
-    while (!onlySingleLettersLeft(phones)) {
+    while (!noContiguousPhonesLeft(phones)) {
       cout << "\n" << phones << "\n";;;;
-      string vbest;
-      string vword;
       auto lenBest = 0;
       vector<pair< vector<string>, string>> bests; // Longest matches of phone strings.
       //cout << "\nscanning prondict...\n";
@@ -358,6 +356,12 @@ int main() {
 	}
       }
       //cout << "scanned.\n";
+      cout << "bests.size = " << bests.size() << "\n";
+      if (bests.size() >= prondictKinyar.size()/4) { // Sometimes it contains the WHOLE prondict, 78136.
+	// Typically lenBest=1, with only a few contiguous phones remaining.
+	cout << "Only poor matches remain.\n";
+	break;
+      }
       // lcs-kinyar.rb line 197
       typedef tuple<int, string, string> Close;
       vector<Close> closests;
@@ -366,18 +370,28 @@ int main() {
       for (const auto& ab: bests) {
 	const auto& substrs = ab.first;
 	const auto& word = ab.second;
-	//cout << "Finding closests for " << word << " -- " << lookup[word] << "\n";
+	//cout << "Finding closests for " << word /* << " -- " << lookup[word] */ << "\n";
 	auto dMin = 9999;
 	for (auto& s: substrs) {
 	  const auto d = levenshtein(lookup[word], s);
 	  if (d < dMin) {
 	    dMin = d;
+	    //cout << "dMin = " << dMin << "\n";
 	    closests.clear();
 	  }
-	  if (d <= dMin)
+	  if (d <= dMin) {
 	    closests.emplace_back(d, word, s);
+	  }
+	}
+	if (closests.empty()) {
+	  cout << ";;;; bug: no closests #1!\n";
+	  continue;
 	}
 	closests.erase(unique(closests.begin(), closests.end()), closests.end()); // remove duplicates
+	if (closests.empty()) {
+	  cout << ";;;; bug: no closests #2!\n";
+	  continue;
+	}
 	//cout << "Closests are:\n"; for (auto c: closests) cout << get<0>(c) << " -- " << get<1>(c) << ", " << get<2>(c) << "\n";
 
 	// Choose one of these, randomly.
@@ -385,12 +399,16 @@ int main() {
 	// RAND_MAX is big enough to avoid sampling bias: typically, size() < 10.
 	candidates.emplace_back(closests[rand() % closests.size()]);
       }
+      if (candidates.empty()) {
+	cout << ";;;; bug: no candidates!\n";
+	continue;
+      }
       // Choose the candidate with the smallest Levenshtein distance.
       const auto& bestOverall = *min_element(candidates.begin(), candidates.end(),
 	[](const Close& lhs, const Close& rhs) { return get<0>(lhs) < get<0>(rhs); });
       const auto& chosenWord = get<1>(bestOverall);
       const auto& chosenPhonestring = get<2>(bestOverall);
-      cout << "Chose d = " << get<0>(bestOverall) << ", " << chosenWord << "\n";
+      cout << "Chose d=" << get<0>(bestOverall) << ", " << chosenWord << "\n";
       // Re-find its phone string in phones.
       const auto iPhone = phones.find(chosenPhonestring);
       // Usually, chosenPhonestring won't be in h[], because it's usually a
@@ -413,11 +431,12 @@ int main() {
 #else
       // Mark each used phone.  Slower, but less overhead than mapping the offset in a shrunken phones[]
       // to the offset in the original.  That offset is what we sort acc by, to reconstruct the order of words.
+      if (iPhone+chosenPhonestring.size() > phones.size())
+	cout << ";;;; bug: overflow!\n";
       for (auto j = iPhone; j < iPhone+chosenPhonestring.size(); ++j)
 	phones[j] = '_';
 #endif
     }
-    cout << "Only isolated single letters left.\n";
 
     // Sort acc by i.  Print its words.
     sort(acc.begin(), acc.end(),
