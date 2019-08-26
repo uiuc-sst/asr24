@@ -1,4 +1,6 @@
 // Longest common substring.  (See Makefile.)
+// In 95 minutes single core, converts 1452 nonsense-English-word transcriptions,
+// totalling 217 KB, to Kinyarwanda.
 
 #include <algorithm>
 #include <cstring>
@@ -171,13 +173,16 @@ map<string, string> pronsFromFile(const char* filename, char delimiter = '\t', b
     }
     if (fCull) {
       // Words chosen too often by LCS: short, vowelless, or consonantless.
-      // Long words that either start with ww or end with org or com or gov are dedotted URLs.
+      // Long words that either start with ww or end with URL suffixes.
+      // Later, also nSiteAdTitleEse, long English words, long unrelated minor geonames
+      // (stuttgart, saskatchewan, goshengottstein, strathclyde).
       const auto n = word.size();
+      const auto dom = n<4 ? "" : word.substr(n-3);
       if (n < 3 ||
 	  word.find_first_of("aeiou") == string::npos ||
 	  word.find_first_of("bcdfghjklmnpqrstvwxyz") == string::npos ||
 	  (n > 7 &&
-	    (word.substr(0,2) == "ww" || word.substr(n-3) == "org" || word.substr(n-3) == "com" || word.substr(n-3) == "gov"))) {
+	    (word.substr(0,2) == "ww" || dom == "org" || dom == "com" || dom == "gov" || dom == "edu"))) {
 	//cout << word << "\n";
 	continue;
       }
@@ -349,6 +354,10 @@ int main() {
     // Keep matching words until phones has only isolated single letters left.
     while (!noContiguousPhonesLeft(phones)) {
       cout << phones << "\n";;;;
+      typedef tuple<int, string, string> Close;
+      vector<Close> candidatesPrev;
+      auto lenReject = 0;
+LRetry:
       auto lenBest = 0;
       vector<pair< vector<string>, string>> bests; // Longest matches of phone strings.
       //cout << "\nscanning prondict...\n";
@@ -357,6 +366,8 @@ int main() {
 	const auto& pron = kv.second;
 	const auto rgLCS = lcs(phones, pron, lenBest);
 	const auto len = rgLCS[0];
+	if (len == lenReject)
+	  continue;
 	const auto n = rgLCS.size() - 1;
 	//cout << "len " << len << "    n " << n << "     w&p: " << word << " , " << pron << "\n";
 	vector<string> substrs; // std::set isn't needed, because rgLCS lacks duplicates.
@@ -373,12 +384,14 @@ int main() {
       }
       //cout << "scanned.\n";
       cout << "bests.size = " << bests.size() << "\n";
-      if (bests.size() >= prondictKinyar.size()/4) { // Sometimes it contains the WHOLE prondict, 78136.
-	// Typically lenBest=1, with only a few contiguous phones remaining.
-	cout << "Only poor matches remain.\n";
+      if (bests.empty()) {
+	// Nothing matched, that's all.
 	break;
       }
-      typedef tuple<int, string, string> Close;
+      if (bests.size() >= prondictKinyar.size()/2) { // Sometimes it contains the WHOLE prondict, 78136.
+	// Typically lenBest=1, with only a few contiguous phones remaining, with poor matches to words.
+	break;
+      }
       vector<Close> closests;
       vector<Close> candidates;
       //cout << "Bests are: "; for (const auto& ab: bests) { const auto& word = ab.second; cout << word << " "; } cout << "\n";
@@ -407,6 +420,7 @@ int main() {
 	  cout << ";;;; bug: no closests #2!\n";
 	  continue;
 	}
+
 	//cout << "Closests are:\n"; for (auto c: closests) cout << get<0>(c) << " -- " << get<1>(c) << ", " << get<2>(c) << "\n";
 
 	// Choose one of these, randomly.
@@ -415,15 +429,34 @@ int main() {
 	candidates.emplace_back(closests[rand() % closests.size()]);
       }
       if (candidates.empty()) {
-	cout << ";;;; bug: no candidates!\n";
-	continue;
+	if (lenReject>0) {
+	  // Revert to the previous set, which isn't empty because we'd used it.
+	  candidates = candidatesPrev;
+	} else {
+	  cout << ";;;; bug: no candidates!\n";
+	  continue;
+	}
       }
+
       // Choose the candidate with the smallest Levenshtein distance.
       const auto& bestOverall = *min_element(candidates.begin(), candidates.end(),
 	[](const Close& lhs, const Close& rhs) { return get<0>(lhs) < get<0>(rhs); });
       const auto& chosenWord = get<1>(bestOverall);
       const auto& chosenPhonestring = get<2>(bestOverall);
+
+      if (lenReject==0 && get<0>(bestOverall) >= 3) {
+	// Greedily taking longest LCS yielded a high Levenshtein distance (>= 3).
+	// Allow shorter substrings, to try to reduce that distance.
+	// Test lenReject==0 to avoid an infinite loop.
+	// Later: try several lenRejects, measure their Lev's, then choose the best.
+	// The case >=3 happens 20% of the time.
+	lenReject = get<2>(closests[0]).size();
+	candidatesPrev = candidates;
+	//cout << "Backtrack!  Discard substrings of length " << lenReject << ", such as " << chosenPhonestring << "\n";
+	goto LRetry;
+      }
       cout << "Chose d=" << get<0>(bestOverall) << ", " << chosenWord << "\n";
+
       // Re-find its phone string in phones.
       const auto iPhone = phones.find(chosenPhonestring);
       // Usually, chosenPhonestring won't be in h[], because it's usually a
