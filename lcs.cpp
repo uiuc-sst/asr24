@@ -160,15 +160,27 @@ map<string, string> pronsFromFile(const char* filename, char delimiter = '\t', b
       istringstream iss(line);
       getline(iss, word, delimiter);
       getline(iss, pron); // omit delimiter?
-      //if (!fCull) cout << word << "\t\t---\t\t" << pron << "\n";;;;
+      //if (!fCull) cout << word << "\t\t---\t\t" << pron << "\n";
       trim(pron);
+      // Remove trailing apostrophe, which can't affect pronunciation.
+      if (word.back() == '\'')
+	word.pop_back();
+      // Cull abbreviations, because they're rarely pronounced.
+      if (word.find(".") != string::npos)
+	continue;
     }
     if (fCull) {
-      // Omit words chosen too often by LCS: short, vowelless, or consonantless.
-      if (word.size() < 3 ||
+      // Words chosen too often by LCS: short, vowelless, or consonantless.
+      // Long words that either start with ww or end with org or com or gov are dedotted URLs.
+      const auto n = word.size();
+      if (n < 3 ||
 	  word.find_first_of("aeiou") == string::npos ||
-	  word.find_first_of("bcdfghjklmnpqrstvwxyz") == string::npos)
+	  word.find_first_of("bcdfghjklmnpqrstvwxyz") == string::npos ||
+	  (n > 7 &&
+	    (word.substr(0,2) == "ww" || word.substr(n-3) == "org" || word.substr(n-3) == "com" || word.substr(n-3) == "gov"))) {
+	//cout << word << "\n";
 	continue;
+      }
     }
     // Deduplicate phones: split at spaces, then accumulate only nonduplicates.
     {
@@ -185,11 +197,17 @@ map<string, string> pronsFromFile(const char* filename, char delimiter = '\t', b
       }
       rtrim(phonesNew);
       pron = phonesNew;
-      //if (!fCull) cout << "\t\t\t\t'" << pron << "'\n";
+    }
+    if (m.count(word) == 1) {
+      if (m[word] == pron)
+	continue;
+      //cout << "Duplicate " << word << ": " << m[word] << " " << pron << "\n"; // For cmudict-plain.txt, 7100 of these.
+      // Of these two pronunciations, arbitrarily keep the shorter one.  It'll match more words.
+      if (m[word].size() < pron.size())
+	continue;
     }
     m[word] = pron;
   }
-  //;;;; tidy, cull, uniq, like lcs-kinyar.rb:72-92.
   return m;
 }
 
@@ -322,17 +340,15 @@ int main() {
   for (auto scrip: scripsPron) {
     const auto& uttid(scrip.first);
     auto phones(scrip.second);
-    cout << uttid << "\t";
     if (phones.empty()) {
       cout << "\n";
       continue;
     }
-    // lcs-kinyar.rb line 141
     typedef pair<int, string> AccPair;
     vector<AccPair> acc;
     // Keep matching words until phones has only isolated single letters left.
     while (!noContiguousPhonesLeft(phones)) {
-      cout << "\n" << phones << "\n";;;;
+      cout << phones << "\n";;;;
       auto lenBest = 0;
       vector<pair< vector<string>, string>> bests; // Longest matches of phone strings.
       //cout << "\nscanning prondict...\n";
@@ -362,7 +378,6 @@ int main() {
 	cout << "Only poor matches remain.\n";
 	break;
       }
-      // lcs-kinyar.rb line 197
       typedef tuple<int, string, string> Close;
       vector<Close> closests;
       vector<Close> candidates;
@@ -441,6 +456,7 @@ int main() {
     // Sort acc by i.  Print its words.
     sort(acc.begin(), acc.end(),
       [](const AccPair& lhs, const AccPair& rhs) { return lhs.first < rhs.first; } );
+    cout << uttid << "\t";
     for (const auto iw: acc)
       cout << iw.second << " ";
     cout << "\n";
