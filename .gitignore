@@ -8,3 +8,6 @@ exp
 *.sh.o*
 # Extracted from http://dl.kaldi-asr.org/models/0001_aspire_chain_model.tar.gz.
 README.txt
+# Compiled binaries
+lcs-kinyar
+lcs-sinhal
