@@ -183,8 +183,10 @@ with timestamp June 11 and version 8,
 `cat $L/lat/*.ascii | sort > $L-nbest.txt`.
 
 ### Special postprocessing.
-If your transcriptions used nonsense English words, convert them to phones and then, via a trie, into L-words:
+If your transcriptions used nonsense English words, convert them to phones and then,
+via a trie or longest common substring, into L-words:
 - `./trie-$L.rb < trie1-scrips.txt > $L-trie-scrips.txt`.
+- `make multicore-$L`; wait; `grep ... > $L-lcs-scrips.txt`.
 
 ### Typical results.
 
