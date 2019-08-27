@@ -1,5 +1,5 @@
 // Longest common substring.  (See Makefile.)
-// Convert nonsense-English-word transcriptions to Kinyarwanda.
+// Convert nonsense-English-word transcriptions to Sinhalese.
 
 #include <algorithm>
 #include <cstring>
@@ -85,25 +85,27 @@ static inline void trim(string &s) {
 }
 
 // Restrict phones.  Map rare ones to common ones.  Map into the prondict.
-// Map vowels to ah, eh, uw.
 void soft(string& phone) {
   static const map<string, string> soundex = {
-    {"aw", "ah"},
-    {"s", "ch"},
-    {"sh", "ch"},
-    {"jh", "ch"},
-    {"iy", "eh"},
-    {"dh", "t"},
-    {"er", "eh"},
-    {"ae", "ah"},
-    {"ao", "ah"},
+    {"ae", "ey"},
+    {"ay", "ey"},
+    {"eh", "ey"},
+    {"oy", "ey"},
+    {"ao", "uh"},
+    {"er", "uh"},
+    {"ah", "aa"},
+    {"aw", "aa"},
+    {"ow", "aa"},
+    {"ch", "jh"},
     {"b", "p"},
-    {"ih", "eh"},
-    {"uh", "ah"},
-    {"aa", "ah"},
-    {"ay", "ah"},
-    {"ow", "uw"},
-    {"ey", "ah"}
+    {"g",  "k"},
+    {"ng", "m"},
+    {"n", "m"},
+    {"th", "s"},
+    {"v",  "f"},
+    {"z", "s"},
+    {"jh", "sh"},
+    {"zh", "sh"}
   };
   const auto it = soundex.find(phone);
   if (it != soundex.end())
@@ -113,28 +115,27 @@ void soft(string& phone) {
 // Remap a phone to a single char (in prondict and scrips) to avoid matching only part of a multichar phone like 'ao'.
 void remap(string& phone) {
   static const map<string, string> tidy = {
-    {"ah", "0"},
-    {"ch", "1"},
+    {"aa", "0"},
+    {"dh", "1"},
     {"d",  "2"},
-    {"eh", "3"},
+    {"ey", "3"},
     {"f",  "4"},
-    {"g",  "5"},
-    {"hh", "6"},
-    {"k",  "7"},
-    {"l",  "8"},
-    {"m",  "9"},
-    {"n",  "a"},
-    {"ng", "b"},
-    {"p",  "c"},
-    {"sil","d"},
-    {"t",  "e"},
-    {"th", "f"},
-    {"uw", "g"},
-    {"v",  "h"},
+    {"hh", "5"},
+    {"ih", "6"},
+    {"iy", "7"},
+    {"k",  "8"},
+    {"l",  "9"},
+    {"m",  "a"},
+    {"p",  "b"},
+    {"r",  "c"},
+    {"s",  "d"},
+    {"sh", "e"},
+    {"t",  "f"},
+    {"uh", "g"},
+    {"uw", "h"},
     {"w",  "i"},
     {"y",  "j"},
-    {"z",  "k"},
-    {"r",  "l"},
+    {"sil","k"},
     {" ",  ""}
   };
   const auto it = tidy.find(phone);
@@ -149,12 +150,6 @@ map<string, string> pronsFromFile(const char* filename, char delimiter = '\t', b
   while (getline(ss, line, '\n')) {
     // Convert to lower case.  May crash for non-ASCII multibyte UTF8.
     transform(line.begin(), line.end(), line.begin(), [](unsigned char c){ return tolower(c); });
-    {
-      // Omit words that begin with a nonletter.
-      const auto firstchar = line[0];
-      if (firstchar < 'a' || firstchar > 'z')
-	continue;
-    }
     // Split at delimiter into word and pronunciation.
     string word, pron;
     {
@@ -171,17 +166,8 @@ map<string, string> pronsFromFile(const char* filename, char delimiter = '\t', b
 	continue;
     }
     if (fCull) {
-      // Words chosen too often by LCS: short, vowelless, or consonantless.
-      // Long words that either start with ww or end with URL suffixes.
-      // Later, also nSiteAdTitleEse, long English words, long unrelated minor geonames
-      // (stuttgart, saskatchewan, goshengottstein, strathclyde).
-      const auto n = word.size();
-      const auto dom = n<4 ? "" : word.substr(n-3);
-      if (n < 3 ||
-	  word.find_first_of("aeiou") == string::npos ||
-	  word.find_first_of("bcdfghjklmnpqrstvwxyz") == string::npos ||
-	  (n > 7 &&
-	    (word.substr(0,2) == "ww" || dom == "org" || dom == "com" || dom == "gov" || dom == "edu"))) {
+      // Words chosen too often by LCS: short (about 30).
+      if (word.size() < 4) {
 	//cout << word << "\n";
 	continue;
       }
@@ -313,15 +299,15 @@ int main() {
   }
   cout << "Pronounced scrips.\n";
 
-  const auto prondictKinyar(pronsFromFile("kinyar-lexicon.txt", ' ', true));
-  // abantu, aa b aa n t uw
+  const auto prondictSinhal(pronsFromFile("sinhal-lexicon.txt", ' ', true));
+  // From a non-trie sinhal's local/dict/lexicon.txt, like trie-sinhal.rb.
 
-  // To optimize, cull prondictKinyar.
+  // To optimize, cull prondictSinhal.
 
   typedef vector<string> MySet;
   unordered_map<string, MySet> h; // Map each pron to a collection of homonym words.
   unordered_map<string, string> lookup; // Map each word to its pron.
-  for (auto& kv: prondictKinyar) {
+  for (auto& kv: prondictSinhal) {
     const auto& word = kv.first;
     const auto& pron = kv.second;
     //cout << "word " << word << " has pron " << pron << ".\n";
@@ -329,7 +315,7 @@ int main() {
     value.emplace_back(word);
     lookup[word] = pron;
   }
-  cout << "Prondict had " << prondictKinyar.size() << " pronunciations.\n";
+  cout << "Prondict had " << prondictSinhal.size() << " pronunciations.\n";
   // Now lookup has all the pronunciations, and h has all the homonyms.
 
 #if 0
@@ -360,7 +346,7 @@ LRetry:
       auto lenBest = 0;
       vector<pair< vector<string>, string>> bests; // Longest matches of phone strings.
       //cout << "\nscanning prondict...\n";
-      for (auto& kv: prondictKinyar) {
+      for (auto& kv: prondictSinhal) {
 	const auto& word = kv.first;
 	const auto& pron = kv.second;
 	const auto rgLCS = lcs(phones, pron, lenBest);
@@ -387,7 +373,7 @@ LRetry:
 	// Nothing matched, that's all.
 	break;
       }
-      if (bests.size() >= prondictKinyar.size()/2) { // Sometimes it contains the WHOLE prondict, 78136.
+      if (bests.size() >= prondictSinhal.size()/2) {
 	// Typically lenBest=1, with only a few contiguous phones remaining, with poor matches to words.
 	break;
       }
@@ -492,13 +478,6 @@ LRetry:
     for (const auto iw: acc)
       cout << iw.second << " ";
     cout << "\n";
-  }
-
-  if (0) {
-    const string s1("t o n z ɛ t ɪ n d ə t ɑ x t ə ɣ ə r j aː r ə m ɛ t m eː ɣ aː ɦ ɪ t s ɑ l s d ə b ɔ m d o r ə s d eː ɛ n ɪ s d");
-    const string s2("avondetappe     ɑ v ɔ n d ə t ɑ p ə");
-    const auto r = lcs(s1, s2);
-    cout << "The LCS of '" << s1 << "'\nand '" << s2 << "'\nis '" << s1.substr(r[1], r[0]) << "', of " << r.size()-1 << " total.\n";
   }
   return 0;
 }
