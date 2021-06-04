@@ -4,7 +4,11 @@ Build an ASR for a surprise language L from a pre-trained acoustic model, an L p
 This approach converts phones directly to L words.  This is less noisy than using multiple cross-trained ASRs to make English words
 from which phone strings are extracted, merged by [PTgen](https://github.com/uiuc-sst/PTgen), and reconstituted into L words.
 
-A full description with performance measurements is on [arXiv](https://arxiv.org/abs/1909.07285).
+A full description with performance measurements is on [arXiv](https://arxiv.org/abs/1909.07285),
+and in:  
+M Hasegawa-Johnson, L Rolston, C Goudeseune, GA Levow, and K Kirchhoff,  
+[Grapheme-to-phoneme transduction for cross-language ASR](https://doi.org/10.1007/978-3-030-59430-5_1), 
+Stat. Lang. Speech Proc.:3‒19, 2020.
 
 <!-- To refresh this TOC, 
 Just once:
